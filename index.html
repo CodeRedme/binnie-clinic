@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Binnie Clinic 🐰 | Cute STAY-Coded Period Tracker</title>
+<meta name="description" content="Binnie Clinic is a cute, STAY-coded period & cycle diary made for Stray Kids fans — log entries, track moods and symptoms, get gentle self-care tips, and see your next period estimate.">
+<link rel="canonical" href="https://binnie-clinic.vercel.app/">
+<meta name="robots" content="index, follow">
+
+<!-- Open Graph / social share preview -->
+<meta property="og:title" content="Binnie Clinic 🐰 — a STAY-coded period diary">
+<meta property="og:description" content="A cute period & cycle tracker made for Stray Kids STAYs — mood logging, symptom tracking, self-care tips, and cycle predictions.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://binnie-clinic.vercel.app/">
+
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FF6FA0">
+<link rel="icon" type="image/png" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Binnie Clinic">
+<meta property="og:image" content="https://binnie-clinic.vercel.app/icon-512.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink-bg: #FFF7EF;
+    --pink-card: #FFFFFF;
+    --pink-soft: #FFE1EC;
+    --pink-accent: #FF6FA0;
+    --pink-accent-dark: #E8447F;
+    --pink-text: #4A2233;
+    --pink-muted: #A9748B;
+    --pink-border: #FFC7DD;
+
+    --dark-bg: #14090D;
+    --dark-card: #1F1216;
+    --dark-soft: #2B1319;
+    --dark-accent: #FF2E4D;
+    --dark-accent-dark: #C81E3A;
+    --dark-text: #FBE7EC;
+    --dark-muted: #C98A9A;
+    --dark-border: #3A1620;
+
+    --bg: var(--pink-bg);
+    --card: var(--pink-card);
+    --soft: var(--pink-soft);
+    --accent: var(--pink-accent);
+    --accent-dark: var(--pink-accent-dark);
+    --text: var(--pink-text);
+    --muted: var(--pink-muted);
+    --border: var(--pink-border);
+  }
+
+  [data-theme="dark"]{
+    --bg: var(--dark-bg);
+    --card: var(--dark-card);
+    --soft: var(--dark-soft);
+    --accent: var(--dark-accent);
+    --accent-dark: var(--dark-accent-dark);
+    --text: var(--dark-text);
+    --muted: var(--dark-muted);
+    --border: var(--dark-border);
+  }
+
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    font-family: 'Fredoka', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: background .4s ease, color .4s ease;
+    min-height:100vh;
+    position:relative;
+    overflow-x:hidden;
+  }
+
+  /* ---------- emoji ambient background (chicks / strawberries / cheese) ---------- */
+  .bg-pattern{
+    position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+  }
+  .bg-emoji{
+    position:absolute; font-size:1.6rem; opacity:.28; user-select:none;
+    filter: saturate(.9);
+  }
+  [data-theme="dark"] .bg-emoji{ opacity:.14; }
+
+  /* ---------- layout ---------- */
+  .wrap{ position:relative; z-index:2; max-width:640px; margin:0 auto; padding:38px 20px 70px; }
+
+  .title{
+    font-family:'Baloo 2', sans-serif; font-weight:800;
+    text-align:center; font-size:2.1rem; letter-spacing:.5px;
+    color:var(--accent-dark); margin:0 0 4px;
+  }
+  .subtitle{ text-align:center; color:var(--muted); margin:0 0 20px; font-size:.95rem; }
+
+  .help-row{ display:flex; justify-content:center; margin-bottom:28px; }
+  .help-btn{
+    font-family:'Baloo 2', sans-serif; font-weight:700; font-size:.85rem;
+    border:1.5px solid var(--accent); background:var(--card); color:var(--accent-dark);
+    padding:10px 18px; border-radius:20px; cursor:pointer; transition: all .15s;
+  }
+  .help-btn:hover{ background:var(--accent); color:#fff; }
+
+  .card{
+    background:var(--card); border:1.5px solid var(--border);
+    border-radius:22px; padding:22px 22px 26px; margin-bottom:22px;
+    box-shadow: 0 8px 24px rgba(232,68,127,.08);
+  }
+
+  .section-label{
+    font-family:'Baloo 2', sans-serif; font-weight:700; font-size:1.02rem;
+    margin:0 0 14px; display:flex; align-items:center; gap:8px; color:var(--text);
+  }
+
+  label.field{ display:block; font-size:.85rem; color:var(--muted); margin:14px 0 6px; font-weight:600; }
+  input[type=date], input[type=number], input[type=text], textarea, select{
+    width:100%; padding:11px 13px; border-radius:14px; border:1.5px solid var(--border);
+    background: var(--bg); color:var(--text); font-family:inherit; font-size:.95rem;
+    outline:none; transition: border-color .2s;
+  }
+  input:focus, textarea:focus, select:focus{ border-color: var(--accent); }
+  textarea{ min-height:80px; resize:vertical; }
+  .hint{ font-size:.75rem; color:var(--muted); margin-top:4px; }
+
+  .mood-grid{ display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+  .mood-chip{
+    border:1.5px solid var(--border); background:var(--bg); border-radius:14px;
+    padding:8px 12px; font-size:.85rem; cursor:pointer; user-select:none; color:var(--text);
+    transition: all .15s;
+  }
+  .mood-chip.active{ background:var(--accent); border-color:var(--accent); color:#fff; transform:scale(1.05); }
+
+  .symptom-grid{ display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+  .symptom-chip{
+    border:1.5px solid var(--border); background:var(--bg); border-radius:14px;
+    padding:7px 12px; font-size:.8rem; cursor:pointer; color:var(--text);
+  }
+  .symptom-chip.active{ background:var(--soft); border-color:var(--accent); font-weight:600; }
+
+  .btn-row{ display:flex; flex-wrap:wrap; gap:10px; margin-top:20px; }
+  button{
+    font-family:'Baloo 2', sans-serif; font-weight:700; font-size:.92rem;
+    border:none; border-radius:16px; padding:13px 18px; cursor:pointer;
+    color:#fff; background:var(--accent); flex:1; min-width:140px;
+    transition: transform .12s, background .2s;
+  }
+  button:hover{ transform: translateY(-2px); background:var(--accent-dark); }
+  button.secondary{ background:var(--soft); color:var(--accent-dark); }
+  button.secondary:hover{ background:var(--border); }
+  button.ghost{ background:transparent; border:1.5px solid var(--border); color:var(--text); }
+
+  /* ---------- stats ---------- */
+  .stats-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:10px; margin-top:8px; }
+  .stat{ background:var(--soft); border-radius:16px; padding:14px 8px; text-align:center; }
+  .stat .num{ font-family:'Baloo 2',sans-serif; font-weight:800; font-size:1.4rem; color:var(--accent-dark); }
+  .stat .lbl{ font-size:.72rem; color:var(--muted); margin-top:2px; }
+
+  .predict-banner{
+    background:linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    color:#fff; border-radius:18px; padding:16px 18px; margin-top:16px;
+    font-size:.9rem; line-height:1.5;
+  }
+  .predict-banner b{ font-family:'Baloo 2', sans-serif; }
+
+  /* ---------- doctor binnie ---------- */
+  .binnie-card{
+    background: var(--soft); border-radius:20px; padding:18px 20px;
+    border:1.5px solid var(--border); display:flex; gap:14px; align-items:flex-start;
+  }
+  .binnie-avatar{
+    width:54px; height:54px; border-radius:50%; flex-shrink:0;
+    background: var(--card); border:2px solid var(--accent);
+    display:flex; align-items:center; justify-content:center; font-size:1.5rem;
+  }
+  .binnie-text b{ font-family:'Baloo 2', sans-serif; color:var(--accent-dark); }
+  .binnie-text p{ margin:6px 0 0; font-size:.9rem; line-height:1.55; }
+  .binnie-refresh{ margin-top:10px; }
+  .binnie-refresh button{ padding:8px 14px; font-size:.78rem; min-width:auto; flex:none; }
+
+  /* ---------- entries list ---------- */
+  .entry{
+    border:1.5px solid var(--border); border-radius:16px; padding:12px 14px; margin-bottom:10px;
+    background:var(--bg);
+  }
+  .entry .row1{ display:flex; justify-content:space-between; font-size:.85rem; font-weight:600; }
+  .entry .row2{ font-size:.8rem; color:var(--muted); margin-top:4px; }
+  .entry .tags{ margin-top:6px; display:flex; gap:6px; flex-wrap:wrap; }
+  .entry .tag{ background:var(--soft); color:var(--accent-dark); font-size:.7rem; padding:3px 8px; border-radius:10px; }
+  .empty{ text-align:center; color:var(--muted); font-size:.85rem; padding:20px 0; }
+
+  .footer{ text-align:center; color:var(--muted); font-size:.78rem; margin-top:30px; line-height:1.6; }
+
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(120%);
+    background:var(--accent-dark); color:#fff; padding:12px 22px; border-radius:16px;
+    font-family:'Baloo 2',sans-serif; font-weight:600; font-size:.85rem; z-index:50;
+    transition: transform .3s ease; box-shadow:0 8px 20px rgba(0,0,0,.2);
+  }
+  .toast.show{ transform:translateX(-50%) translateY(0); }
+
+  /* ---------- help modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:100;
+    display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay.show{ display:flex; }
+  .modal{
+    background:var(--card); border-radius:24px; padding:26px 24px; max-width:480px; width:100%;
+    max-height:85vh; overflow-y:auto; border:1.5px solid var(--border);
+  }
+  .modal h2{ font-family:'Baloo 2', sans-serif; color:var(--accent-dark); margin:0 0 4px; font-size:1.3rem; }
+  .modal .modal-sub{ font-size:.82rem; color:var(--muted); margin-bottom:16px; }
+  .modal h3{ font-family:'Baloo 2', sans-serif; font-size:.95rem; color:var(--text); margin:16px 0 6px; }
+  .modal p, .modal li{ font-size:.87rem; line-height:1.6; color:var(--text); }
+  .modal ul{ margin:4px 0; padding-left:20px; }
+  .modal-close{ margin-top:16px; width:100%; }
+  .modal-note{ background:var(--soft); border-radius:14px; padding:12px 14px; font-size:.8rem; margin-top:14px; color:var(--muted); }
+</style>
+</head>
+<body data-theme="light">
+
+<div class="bg-pattern" id="bgPattern"></div>
+
+<div class="wrap">
+
+  <h1 class="title">🐰 Binnie Clinic</h1>
+  <p class="subtitle">a lil STAY-coded diary for your cycle · created by Tulika (@minberrydiary) 💗</p>
+
+  <div class="help-row">
+    <button class="help-btn" id="helpBtn" type="button">Need Help? 🐰</button>
+  </div>
+
+  <!-- STATS + PREDICTION -->
+  <div class="card">
+    <div class="section-label">📊 Your Stats</div>
+    <div class="stats-grid">
+      <div class="stat"><div class="num" id="statStreak">0</div><div class="lbl">entries logged</div></div>
+      <div class="stat"><div class="num" id="statAvgCycle">–</div><div class="lbl">avg cycle (days)</div></div>
+      <div class="stat"><div class="num" id="statTopMood">–</div><div class="lbl">top mood</div></div>
+    </div>
+    <div class="predict-banner" id="predictBanner">
+      Log a couple entries and I'll start predicting your next cycle 🔮
+    </div>
+  </div>
+
+  <!-- DR BINNIE -->
+  <div class="card">
+    <div class="section-label">🩺 Dr. Binnie's Corner</div>
+    <div class="binnie-card">
+      <div class="binnie-avatar">🐰</div>
+      <div class="binnie-text">
+        <b>Dr. Binnie says:</b>
+        <p id="binnieTip">Loading today's advice...</p>
+        <div class="binnie-refresh"><button id="binnieBtn" class="secondary" type="button">New tip 🔁</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOG ENTRY -->
+  <div class="card">
+    <div class="section-label">📅 Log Today</div>
+
+    <label class="field">📅 Period Start Date</label>
+    <input type="date" id="startDate">
+
+    <label class="field">🩲 Period Length (days)</label>
+    <input type="number" id="periodLength" min="1" max="10" placeholder="Usually 4–7 days">
+    <div class="hint">Usually 4–7 days</div>
+
+    <label class="field">🔁 Cycle Length (days)</label>
+    <input type="number" id="cycleLength" min="15" max="45" placeholder="28" value="28">
+    <div class="hint">Default is 28 if unsure</div>
+
+    <label class="field">🎭 Mood Today</label>
+    <div class="mood-grid" id="moodGrid">
+      <div class="mood-chip" data-mood="😊 Good">😊 Good</div>
+      <div class="mood-chip" data-mood="😐 Meh">😐 Meh</div>
+      <div class="mood-chip" data-mood="😢 Low">😢 Low</div>
+      <div class="mood-chip" data-mood="😡 Irritable">😡 Irritable</div>
+      <div class="mood-chip" data-mood="😴 Tired">😴 Tired</div>
+      <div class="mood-chip" data-mood="🥰 Soft">🥰 Soft</div>
+    </div>
+
+    <label class="field">🌡️ Symptoms (tap all that apply)</label>
+    <div class="symptom-grid" id="symptomGrid">
+      <div class="symptom-chip" data-symptom="Cramps">Cramps</div>
+      <div class="symptom-chip" data-symptom="Bloating">Bloating</div>
+      <div class="symptom-chip" data-symptom="Headache">Headache</div>
+      <div class="symptom-chip" data-symptom="Fatigue">Fatigue</div>
+      <div class="symptom-chip" data-symptom="Cravings">Cravings</div>
+      <div class="symptom-chip" data-symptom="Backache">Backache</div>
+      <div class="symptom-chip" data-symptom="Nausea">Nausea</div>
+      <div class="symptom-chip" data-symptom="Acne">Acne</div>
+    </div>
+
+    <label class="field">📝 Notes</label>
+    <textarea id="notes" placeholder="Light cramps, watched SKZ VLive, wanted chocolate..."></textarea>
+
+    <div class="btn-row">
+      <button id="saveBtn" type="button">💾 Save Entry</button>
+      <button id="viewBtn" class="secondary" type="button">📖 View All Entries</button>
+      <button id="toggleBtn" class="ghost" type="button">🌓 Toggle Mode</button>
+    </div>
+  </div>
+
+  <!-- ENTRIES -->
+  <div class="card" id="entriesCard" style="display:none;">
+    <div class="section-label">📖 All Entries</div>
+    <div id="entriesList"></div>
+  </div>
+
+  <!-- SELF CARE -->
+  <div class="card">
+    <div class="section-label">🌸 Period Self-Care Tips (SKZ style)</div>
+    <div style="font-size:.9rem; line-height:2;">
+      • Listen to "Slump" and cry it out 😭<br>
+      • Heat pad + hoodie = comfort 🔥<br>
+      • Hydrate like Hyunjin hydrates his skin 💧<br>
+      • Watch SKZ Code, Chan's Room or 2 Kids Room 🚗<br>
+      • Rest.
+    </div>
+  </div>
+
+  <div class="footer">
+    Created by Tulika Soni 🌷 x STAY project 💗<br>
+    © 2026 "Binnie Clinic." Original fan-made project — not affiliated with JYP Entertainment.
+  </div>
+</div>
+
+<div class="toast" id="toast">Saved! 💾</div>
+
+<!-- HELP MODAL -->
+<div class="modal-overlay" id="helpOverlay">
+  <div class="modal">
+    <h2>New here? Welcome to the clinic 🐰</h2>
+    <div class="modal-sub">A quick, no-pressure explainer if you're just starting to track your period.</div>
+
+    <h3>What's actually happening?</h3>
+    <p>A period is your body shedding the uterus lining once a month if pregnancy hasn't happened — it's a completely normal, healthy part of the reproductive cycle, not something to be embarrassed about.</p>
+
+    <h3>The general numbers</h3>
+    <ul>
+      <li>First periods usually show up somewhere between ages 10–15, but everybody's timeline is different.</li>
+      <li>A "cycle" is counted from the first day of one period to the first day of the next — commonly around 21–35 days, with 28 being the textbook average.</li>
+      <li>The bleeding itself usually lasts about 3–7 days.</li>
+      <li>Irregular cycles are very common in the first couple years — it usually settles down over time.</li>
+    </ul>
+
+    <h3>What can help day-to-day</h3>
+    <ul>
+      <li>Pads, tampons, or menstrual cups are all normal options — it's personal preference, try what feels comfortable.</li>
+      <li>A heating pad or hot water bottle on the lower belly can ease cramps.</li>
+      <li>Staying hydrated and gentle movement (even just walking) can help with bloating and mood.</li>
+      <li>Keeping a few supplies in your bag removes a lot of the stress around surprise starts.</li>
+    </ul>
+
+    <h3>When to actually check in with a doctor</h3>
+    <ul>
+      <li>No period at all by around age 15–16.</li>
+      <li>Bleeding so heavy you're soaking through a pad/tampon every hour.</li>
+      <li>Pain that stops you from going about your day, even with rest or a heating pad.</li>
+      <li>Periods that suddenly become very irregular after being regular.</li>
+    </ul>
+    <div class="modal-note">This is general info to help you get oriented, not medical advice — a doctor or gynecologist is always the right call for anything that worries you.</div>
+
+    <button class="modal-close" id="closeHelp" type="button">Got it, thanks 🐰</button>
+  </div>
+</div>
+
+<script>
+  // ---------------- background emoji pattern (chick / strawberry / cheese) ----------------
+  const emojiSet = ['🐤','🐥','🍓','🧀','🍡'];
+  const bgPattern = document.getElementById('bgPattern');
+  const bgCount = 45;
+  for(let i=0;i<bgCount;i++){
+    const span = document.createElement('span');
+    span.className = 'bg-emoji';
+    span.textContent = emojiSet[Math.floor(Math.random()*emojiSet.length)];
+    span.style.top = (Math.random()*100) + '%';
+    span.style.left = (Math.random()*100) + '%';
+    span.style.transform = `rotate(${Math.floor(Math.random()*40 - 20)}deg)`;
+    span.style.fontSize = (1.1 + Math.random()*1.2) + 'rem';
+    bgPattern.appendChild(span);
+  }
+
+  // ---------------- state (persisted in localStorage — this is your real
+  // live site, so entries survive refreshes and browser restarts) ----------------
+  const STORAGE_KEY = 'binnieClinicEntries';
+  function loadEntries(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){ return []; }
+  }
+  function saveEntries(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)); }catch(e){}
+  }
+  let entries = loadEntries();
+  let selectedMood = null;
+  let selectedSymptoms = new Set();
+
+  const binnieTips = [
+    "Heating pad on low + oversized hoodie = instant STAY-approved comfort. No notes.",
+    "Cravings hitting? Chocolate is basically a certified mood stabilizer today, go for it.",
+    "Cramps bad? Gentle stretching or just lying flat and watching a Stray Kids vlive both count as self-care.",
+    "Hydrate! Water bottle nearby, sip through the day like it's your job.",
+    "Low energy days are valid days. Rest isn't lazy, it's recovery — protect your nap time.",
+    "If you're irritable, that's okay too. Tell the people around you it's just today, not you.",
+    "A warm bath + a slow playlist can do more for cramps than you'd expect.",
+    "Iron-rich snacks (nuts, dried fruit) can help if you're feeling extra drained this week.",
+    "You don't owe anyone full energy today. Bare minimum is a completely acceptable goal.",
+    "Track your patterns — knowing your own rhythm is the real power move here."
+  ];
+
+  function randomTip(){
+    return binnieTips[Math.floor(Math.random()*binnieTips.length)];
+  }
+  document.getElementById('binnieTip').textContent = randomTip();
+  document.getElementById('binnieBtn').addEventListener('click', ()=>{
+    document.getElementById('binnieTip').textContent = randomTip();
+  });
+
+  // help modal
+  const helpOverlay = document.getElementById('helpOverlay');
+  document.getElementById('helpBtn').addEventListener('click', ()=> helpOverlay.classList.add('show'));
+  document.getElementById('closeHelp').addEventListener('click', ()=> helpOverlay.classList.remove('show'));
+  helpOverlay.addEventListener('click', (e)=>{ if(e.target === helpOverlay) helpOverlay.classList.remove('show'); });
+
+  // mood chips
+  document.querySelectorAll('.mood-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('.mood-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      selectedMood = chip.dataset.mood;
+    });
+  });
+
+  // symptom chips
+  document.querySelectorAll('.symptom-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      chip.classList.toggle('active');
+      const s = chip.dataset.symptom;
+      if(selectedSymptoms.has(s)) selectedSymptoms.delete(s);
+      else selectedSymptoms.add(s);
+    });
+  });
+
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(()=> t.classList.remove('show'), 2200);
+  }
+
+  function updateStats(){
+    document.getElementById('statStreak').textContent = entries.length;
+
+    const cycleLens = entries.map(e=>parseInt(e.cycleLength)).filter(n=>!isNaN(n));
+    const avg = cycleLens.length ? Math.round(cycleLens.reduce((a,b)=>a+b,0)/cycleLens.length) : null;
+    document.getElementById('statAvgCycle').textContent = avg ?? '–';
+
+    const moodCounts = {};
+    entries.forEach(e=>{ if(e.mood) moodCounts[e.mood] = (moodCounts[e.mood]||0)+1; });
+    const topMood = Object.keys(moodCounts).sort((a,b)=>moodCounts[b]-moodCounts[a])[0];
+    document.getElementById('statTopMood').textContent = topMood ? topMood.split(' ')[0] : '–';
+
+    const banner = document.getElementById('predictBanner');
+    const dated = entries.filter(e=>e.startDate).sort((a,b)=> new Date(b.startDate) - new Date(a.startDate));
+    if(dated.length){
+      const latest = dated[0];
+      const cLen = parseInt(latest.cycleLength) || 28;
+      const nextDate = new Date(latest.startDate);
+      nextDate.setDate(nextDate.getDate() + cLen);
+      const opts = { month:'short', day:'numeric' };
+      banner.innerHTML = `<b>🔮 Next period estimate:</b> ${nextDate.toLocaleDateString('en-US', opts)} <br><span style="opacity:.85; font-size:.8rem;">based on your last logged start date + ${cLen}-day cycle. Rough estimate, not medical advice.</span>`;
+    } else {
+      banner.textContent = "Log a couple entries and I'll start predicting your next cycle 🔮";
+    }
+  }
+
+  function renderEntries(){
+    const list = document.getElementById('entriesList');
+    if(!entries.length){
+      list.innerHTML = '<div class="empty">No entries yet — save your first one above 🍓</div>';
+      return;
+    }
+    list.innerHTML = entries.slice().reverse().map(e=>{
+      const tags = e.symptoms.length ? e.symptoms.map(s=>`<span class="tag">${s}</span>`).join('') : '';
+      return `<div class="entry">
+        <div class="row1"><span>${e.startDate || 'No date'} · ${e.mood || 'No mood set'}</span><span>${e.periodLength ? e.periodLength+'d period' : ''}</span></div>
+        <div class="row2">${e.notes || 'No notes'}</div>
+        ${tags ? `<div class="tags">${tags}</div>` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('saveBtn').addEventListener('click', ()=>{
+    const entry = {
+      startDate: document.getElementById('startDate').value,
+      periodLength: document.getElementById('periodLength').value,
+      cycleLength: document.getElementById('cycleLength').value || '28',
+      mood: selectedMood,
+      symptoms: Array.from(selectedSymptoms),
+      notes: document.getElementById('notes').value
+    };
+    entries.push(entry);
+    saveEntries();
+    updateStats();
+    renderEntries();
+    showToast('Saved! 💾');
+
+    document.getElementById('startDate').value='';
+    document.getElementById('periodLength').value='';
+    document.getElementById('notes').value='';
+    document.querySelectorAll('.mood-chip').forEach(c=>c.classList.remove('active'));
+    document.querySelectorAll('.symptom-chip').forEach(c=>c.classList.remove('active'));
+    selectedMood = null;
+    selectedSymptoms.clear();
+  });
+
+  document.getElementById('viewBtn').addEventListener('click', ()=>{
+    const card = document.getElementById('entriesCard');
+    const isHidden = card.style.display === 'none';
+    card.style.display = isHidden ? 'block' : 'none';
+    if(isHidden) renderEntries();
+  });
+
+  document.getElementById('toggleBtn').addEventListener('click', ()=>{
+    const body = document.body;
+    const isDark = body.dataset.theme === 'dark';
+    body.dataset.theme = isDark ? 'light' : 'dark';
+  });
+
+  updateStats();
+
+  // register service worker so the site can be installed as an app
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', ()=>{
+      navigator.serviceWorker.register('/sw.js').catch(()=>{});
+    });
+  }
+</script>
+</body>
+</html>

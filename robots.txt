@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://binnie-clinic.vercel.app/sitemap.xml
