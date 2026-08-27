@@ -89,6 +89,47 @@
   }
   [data-theme="dark"] .bg-emoji{ opacity:.14; }
 
+  /* ---------- ship match game ---------- */
+  .ship-hint{ font-size:.82rem; color:var(--muted); margin:0 0 14px; line-height:1.5; }
+  .ship-arena{
+    position:relative; width:100%; height:340px; border-radius:18px;
+    background: var(--soft); border:1.5px solid var(--border); overflow:hidden; touch-action:none;
+  }
+  .ship-bubble{
+    position:absolute; width:64px; height:64px; border-radius:50%;
+    background:var(--card); border:2px solid var(--border); box-shadow:0 4px 10px rgba(0,0,0,.12);
+    display:flex; align-items:center; justify-content:center; font-size:1.6rem;
+    cursor:grab; user-select:none; touch-action:none;
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1), border-color .3s, box-shadow .3s;
+    animation: bob 3.4s ease-in-out infinite;
+  }
+  .ship-bubble:active{ cursor:grabbing; animation:none; }
+  .ship-bubble.dragging{ z-index:20; animation:none; box-shadow:0 10px 22px rgba(0,0,0,.2); }
+  .ship-bubble.matched{ border-color: var(--accent); box-shadow:0 0 0 4px rgba(255,111,160,.25); }
+  .ship-bubble.shake{ animation: shake .45s ease; }
+  .ship-bubble .name{
+    position:absolute; bottom:-20px; left:50%; transform:translateX(-50%);
+    font-size:.62rem; font-weight:600; color:var(--muted); white-space:nowrap;
+  }
+  @keyframes bob{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-5px);} }
+  @keyframes shake{
+    0%,100%{ transform:translateX(0); }
+    20%{ transform:translateX(-8px); }
+    40%{ transform:translateX(7px); }
+    60%{ transform:translateX(-5px); }
+    80%{ transform:translateX(4px); }
+  }
+  .heart-pop{
+    position:absolute; pointer-events:none; font-size:1.3rem; opacity:1;
+    animation: heartPop 1s ease forwards;
+  }
+  @keyframes heartPop{
+    0%{ transform:translateY(0) scale(.6); opacity:1; }
+    100%{ transform:translateY(-40px) scale(1.3); opacity:0; }
+  }
+  .ship-reset{ margin-top:12px; }
+  .ship-reset button{ min-width:auto; padding:9px 16px; font-size:.8rem; flex:none; }
+
   /* ---------- layout ---------- */
   .wrap{ position:relative; z-index:2; max-width:640px; margin:0 auto; padding:38px 20px 70px; }
 
@@ -99,7 +140,7 @@
   }
   .subtitle{ text-align:center; color:var(--muted); margin:0 0 20px; font-size:.95rem; }
 
-  .help-row{ display:flex; justify-content:center; margin-bottom:28px; }
+  .help-row{ display:flex; justify-content:center; gap:10px; margin-bottom:28px; flex-wrap:wrap; }
   .help-btn{
     font-family:'Baloo 2', sans-serif; font-weight:700; font-size:.85rem;
     border:1.5px solid var(--accent); background:var(--card); color:var(--accent-dark);
@@ -192,6 +233,11 @@
   .entry .row2{ font-size:.8rem; color:var(--muted); margin-top:4px; }
   .entry .tags{ margin-top:6px; display:flex; gap:6px; flex-wrap:wrap; }
   .entry .tag{ background:var(--soft); color:var(--accent-dark); font-size:.7rem; padding:3px 8px; border-radius:10px; }
+  .delete-entry{
+    background:none; border:none; cursor:pointer; font-size:.9rem; padding:2px 4px;
+    flex:none; min-width:auto; opacity:.7; transition: opacity .15s, transform .15s;
+  }
+  .delete-entry:hover{ opacity:1; transform:scale(1.15); background:none; }
   .empty{ text-align:center; color:var(--muted); font-size:.85rem; padding:20px 0; }
 
   .footer{ text-align:center; color:var(--muted); font-size:.78rem; margin-top:30px; line-height:1.6; }
@@ -325,6 +371,14 @@
       • Watch SKZ Code, Chan's Room or 2 Kids Room 🚗<br>
       • Rest.
     </div>
+  </div>
+
+  <!-- SHIP MATCH GAME -->
+  <div class="card">
+    <div class="section-label">💌 Ship Match</div>
+    <p class="ship-hint">Drag two bubbles together — if it's meant to be, they'll pull in close. If not... they're bouncing right back apart 😭</p>
+    <div class="ship-arena" id="shipArena"></div>
+    <div class="ship-reset"><button class="secondary" id="shipReset" type="button">Reset bubbles 🔄</button></div>
   </div>
 
   <div class="footer">
@@ -493,15 +547,28 @@
     list.innerHTML = entries.slice().reverse().map(e=>{
       const tags = e.symptoms.length ? e.symptoms.map(s=>`<span class="tag">${s}</span>`).join('') : '';
       return `<div class="entry">
-        <div class="row1"><span>${e.startDate || 'No date'} · ${e.mood || 'No mood set'}</span><span>${e.periodLength ? e.periodLength+'d period' : ''}</span></div>
+        <div class="row1"><span>${e.startDate || 'No date'} · ${e.mood || 'No mood set'}</span><span style="display:flex; align-items:center; gap:8px;">${e.periodLength ? e.periodLength+'d period' : ''}<button class="delete-entry" data-id="${e.id}" title="Delete this entry" type="button">🗑️</button></span></div>
         <div class="row2">${e.notes || 'No notes'}</div>
         ${tags ? `<div class="tags">${tags}</div>` : ''}
       </div>`;
     }).join('');
+
+    list.querySelectorAll('.delete-entry').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const id = btn.dataset.id;
+        if(!confirm('Delete this entry? This can\'t be undone.')) return;
+        entries = entries.filter(e => String(e.id) !== id);
+        saveEntries();
+        updateStats();
+        renderEntries();
+        showToast('Entry deleted 🗑️');
+      });
+    });
   }
 
   document.getElementById('saveBtn').addEventListener('click', ()=>{
     const entry = {
+      id: Date.now() + '-' + Math.random().toString(36).slice(2,8),
       startDate: document.getElementById('startDate').value,
       periodLength: document.getElementById('periodLength').value,
       cycleLength: document.getElementById('cycleLength').value || '28',
@@ -538,6 +605,167 @@
   });
 
   updateStats();
+
+  // ---------------- Ship Match mini game ----------------
+  const members = [
+    { id:'chan',      name:'Chan',      emoji:'🐺' },
+    { id:'in',        name:'I.N',       emoji:'🦊' },
+    { id:'leeknow',   name:'Lee Know',  emoji:'🐰' },
+    { id:'han',       name:'Han',       emoji:'🐿️' },
+    { id:'changbin',  name:'Changbin',  emoji:'🐰🐷' },
+    { id:'seungmin',  name:'Seungmin',  emoji:'🐶' },
+    { id:'hyunjin',   name:'Hyunjin',   emoji:'🥟' },
+    { id:'felix',     name:'Felix',     emoji:'🐥' },
+  ];
+  const ships = [
+    ['chan','in'], ['leeknow','han'], ['changbin','seungmin'], ['hyunjin','felix']
+  ];
+  function isShip(a, b){
+    return ships.some(pair => (pair[0]===a && pair[1]===b) || (pair[0]===b && pair[1]===a));
+  }
+
+  const arena = document.getElementById('shipArena');
+  let bubbleState = {}; // id -> {x,y,matchedWith}
+
+  function randomPositions(){
+    const w = arena.clientWidth, h = arena.clientHeight;
+    const bw = 64;
+    members.forEach(m=>{
+      bubbleState[m.id] = {
+        x: Math.random() * (w - bw - 20) + 10,
+        y: Math.random() * (h - bw - 20) + 10,
+        matchedWith: null
+      };
+    });
+  }
+
+  function renderBubbles(){
+    arena.querySelectorAll('.ship-bubble').forEach(b=>b.remove());
+    members.forEach(m=>{
+      const state = bubbleState[m.id];
+      const el = document.createElement('div');
+      el.className = 'ship-bubble';
+      el.dataset.id = m.id;
+      el.style.left = state.x + 'px';
+      el.style.top = state.y + 'px';
+      el.style.animationDelay = (Math.random()*2) + 's';
+      el.innerHTML = `${m.emoji}<span class="name">${m.name}</span>`;
+      if(state.matchedWith) el.classList.add('matched');
+      arena.appendChild(el);
+      attachDrag(el, m.id);
+    });
+  }
+
+  function attachDrag(el, id){
+    let dragging = false, offsetX = 0, offsetY = 0;
+
+    function pointerDown(e){
+      dragging = true;
+      el.classList.add('dragging');
+      const rect = el.getBoundingClientRect();
+      const arenaRect = arena.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      offsetX = clientX - rect.left;
+      offsetY = clientY - rect.top;
+      e.preventDefault();
+    }
+
+    function pointerMove(e){
+      if(!dragging) return;
+      const arenaRect = arena.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      let x = clientX - arenaRect.left - offsetX;
+      let y = clientY - arenaRect.top - offsetY;
+      x = Math.max(0, Math.min(arenaRect.width - 64, x));
+      y = Math.max(0, Math.min(arenaRect.height - 64, y));
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      bubbleState[id].x = x;
+      bubbleState[id].y = y;
+    }
+
+    function pointerUp(){
+      if(!dragging) return;
+      dragging = false;
+      el.classList.remove('dragging');
+      checkProximity(id);
+    }
+
+    el.addEventListener('mousedown', pointerDown);
+    el.addEventListener('touchstart', pointerDown, { passive:false });
+    window.addEventListener('mousemove', pointerMove);
+    window.addEventListener('touchmove', pointerMove, { passive:false });
+    window.addEventListener('mouseup', pointerUp);
+    window.addEventListener('touchend', pointerUp);
+  }
+
+  function checkProximity(id){
+    const a = bubbleState[id];
+    let closestId = null, closestDist = Infinity;
+    members.forEach(m=>{
+      if(m.id === id) return;
+      const b = bubbleState[m.id];
+      const dx = (a.x) - (b.x), dy = (a.y) - (b.y);
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if(dist < closestDist){ closestDist = dist; closestId = m.id; }
+    });
+    if(closestId && closestDist < 70){
+      if(isShip(id, closestId)){
+        attractPair(id, closestId);
+      } else {
+        repelPair(id, closestId);
+      }
+    }
+  }
+
+  function attractPair(idA, idB){
+    const a = bubbleState[idA], b = bubbleState[idB];
+    const midX = (a.x + b.x) / 2, midY = (a.y + b.y) / 2;
+    a.x = midX - 34; a.y = midY;
+    b.x = midX + 34; b.y = midY;
+    a.matchedWith = idB; b.matchedWith = idA;
+
+    const elA = arena.querySelector(`[data-id="${idA}"]`);
+    const elB = arena.querySelector(`[data-id="${idB}"]`);
+    if(elA){ elA.style.left = a.x+'px'; elA.style.top = a.y+'px'; elA.classList.add('matched'); }
+    if(elB){ elB.style.left = b.x+'px'; elB.style.top = b.y+'px'; elB.classList.add('matched'); }
+
+    const heart = document.createElement('div');
+    heart.className = 'heart-pop';
+    heart.textContent = '💗';
+    heart.style.left = (midX + 14) + 'px';
+    heart.style.top = (midY - 10) + 'px';
+    arena.appendChild(heart);
+    setTimeout(()=> heart.remove(), 1000);
+  }
+
+  function repelPair(idA, idB){
+    const a = bubbleState[idA], b = bubbleState[idB];
+    const arenaRect = arena.getBoundingClientRect();
+    let dx = a.x - b.x, dy = a.y - b.y;
+    const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+    dx /= dist; dy /= dist;
+    a.x = Math.max(0, Math.min(arenaRect.width - 64, a.x + dx*90));
+    a.y = Math.max(0, Math.min(arenaRect.height - 64, a.y + dy*90));
+
+    const elA = arena.querySelector(`[data-id="${idA}"]`);
+    if(elA){
+      elA.style.left = a.x+'px'; elA.style.top = a.y+'px';
+      elA.classList.add('shake');
+      setTimeout(()=> elA.classList.remove('shake'), 450);
+    }
+  }
+
+  document.getElementById('shipReset').addEventListener('click', ()=>{
+    randomPositions();
+    renderBubbles();
+  });
+
+  randomPositions();
+  renderBubbles();
+  window.addEventListener('resize', ()=>{ randomPositions(); renderBubbles(); });
 
   // register service worker so the site can be installed as an app
   if('serviceWorker' in navigator){
