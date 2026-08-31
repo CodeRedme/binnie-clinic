@@ -267,19 +267,62 @@
   .modal ul{ margin:4px 0; padding-left:20px; }
   .modal-close{ margin-top:16px; width:100%; }
   .modal-note{ background:var(--soft); border-radius:14px; padding:12px 14px; font-size:.8rem; margin-top:14px; color:var(--muted); }
+
+  /* ---------- background theme layer ---------- */
+  .bg-theme-layer{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-repeat:repeat; background-size:170px auto;
+    opacity:0; transition: opacity .4s ease;
+  }
+  .bg-theme-layer.show{ opacity:.16; }
+  [data-theme="dark"] .bg-theme-layer.show{ opacity:.1; }
+
+  /* ---------- background picker (settings) ---------- */
+  .bg-picker{ display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
+  .bg-option{ display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; width:64px; }
+  .bg-swatch{
+    width:58px; height:58px; border-radius:16px; border:2px solid var(--border);
+    background-color:var(--soft); background-size:cover; background-position:center;
+    display:flex; align-items:center; justify-content:center; font-size:.7rem;
+    transition: border-color .15s, transform .15s;
+  }
+  .bg-swatch-emoji{ font-size:1.1rem; }
+  .bg-option span{ font-size:.7rem; color:var(--muted); font-weight:600; }
+  .bg-option.active .bg-swatch{ border-color:var(--accent); transform:scale(1.06); box-shadow:0 0 0 3px rgba(255,111,160,.2); }
+
+  /* ---------- update banner ---------- */
+  .update-banner{
+    position:fixed; top:14px; left:50%; transform:translateX(-50%) translateY(-140%);
+    z-index:80; background:var(--card); border:1.5px solid var(--accent);
+    border-radius:18px; padding:12px 16px; max-width:420px; width:calc(100% - 32px);
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px; justify-content:space-between;
+    box-shadow:0 10px 26px rgba(0,0,0,.18); font-size:.82rem; color:var(--text);
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+  }
+  .update-banner.show{ transform:translateX(-50%) translateY(0); }
+  .update-banner button{
+    flex:none; min-width:auto; padding:8px 14px; font-size:.78rem; margin:0;
+  }
 </style>
 </head>
 <body data-theme="light">
 
 <div class="bg-pattern" id="bgPattern"></div>
+<div class="bg-theme-layer" id="bgThemeLayer"></div>
+
+<div class="update-banner" id="updateBanner">
+  <span>🐷 A new Clinic update is ready! We've added some new things for you. ✨</span>
+  <button id="updateNowBtn" type="button">Update now</button>
+</div>
 
 <div class="wrap">
 
   <h1 class="title">🐰 Binnie Clinic</h1>
-  <p class="subtitle">a lil STAY-coded diary for your cycle · created by Tulika (@minberrydiary) 💗</p>
+  <p class="subtitle" id="subtitle">a lil STAY-coded diary for your cycle · created by Tulika (@minberrydiary) 💗</p>
 
   <div class="help-row">
     <button class="help-btn" id="helpBtn" type="button">Need Help? 🐰</button>
+    <button class="help-btn" id="settingsBtn" type="button">⚙️ Settings</button>
   </div>
 
   <!-- STATS + PREDICTION -->
@@ -427,6 +470,41 @@
   </div>
 </div>
 
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsOverlay">
+  <div class="modal">
+    <h2>Settings 🐰</h2>
+    <div class="modal-sub">Make the clinic feel like yours.</div>
+
+    <h3>Your name</h3>
+    <input type="text" id="nameInput" maxlength="20" placeholder="What should Dr. Binnie call you?">
+    <div class="hint">Used to say hi around the app — nothing leaves your device.</div>
+
+    <h3>Background</h3>
+    <div class="bg-picker" id="bgPicker">
+      <div class="bg-option" data-bg="emoji"><div class="bg-swatch bg-swatch-emoji">🐤🍓🧀</div><span>Classic</span></div>
+      <div class="bg-option" data-bg="piggy"><div class="bg-swatch" style="background-image:url('/assets/bg-piggy.png')"></div><span>Piggy</span></div>
+      <div class="bg-option" data-bg="bunny"><div class="bg-swatch" style="background-image:url('/assets/bg-bunny.png')"></div><span>Bunny</span></div>
+      <div class="bg-option" data-bg="penguin"><div class="bg-swatch" style="background-image:url('/assets/bg-penguin.png')"></div><span>Binnie</span></div>
+      <div class="bg-option" data-bg="puppy"><div class="bg-swatch" style="background-image:url('/assets/bg-puppy.png')"></div><span>Puppy</span></div>
+    </div>
+
+    <div class="modal-note" id="aboutNote">Binnie Clinic <span id="versionTag"></span> 🐷</div>
+
+    <button class="modal-close" id="closeSettings" type="button">Done 🐰</button>
+  </div>
+</div>
+
+<!-- FIRST-VISIT NAME PROMPT -->
+<div class="modal-overlay" id="namePromptOverlay">
+  <div class="modal">
+    <h2>Hi! Welcome to the clinic 🐰</h2>
+    <div class="modal-sub">Before we start, what should Dr. Binnie call you?</div>
+    <input type="text" id="namePromptInput" maxlength="20" placeholder="Your name (or leave blank)">
+    <button class="modal-close" id="saveNamePrompt" type="button">Let's go 💗</button>
+  </div>
+</div>
+
 <script>
   // ---------------- background emoji pattern (chick / strawberry / cheese) ----------------
   const emojiSet = ['🐤','🐥','🍓','🧀','🍡'];
@@ -463,17 +541,18 @@
     "Heating pad on low + oversized hoodie = instant STAY-approved comfort. No notes.",
     "Cravings hitting? Chocolate is basically a certified mood stabilizer today, go for it.",
     "Cramps bad? Gentle stretching or just lying flat and watching a Stray Kids vlive both count as self-care.",
-    "Hydrate! Water bottle nearby, sip through the day like it's your job.",
-    "Low energy days are valid days. Rest isn't lazy, it's recovery — protect your nap time.",
+    "Hydrate, {name}! Water bottle nearby, sip through the day like it's your job.",
+    "Low energy days are valid days, {name}. Rest isn't lazy, it's recovery — protect your nap time.",
     "If you're irritable, that's okay too. Tell the people around you it's just today, not you.",
     "A warm bath + a slow playlist can do more for cramps than you'd expect.",
     "Iron-rich snacks (nuts, dried fruit) can help if you're feeling extra drained this week.",
-    "You don't owe anyone full energy today. Bare minimum is a completely acceptable goal.",
+    "You don't owe anyone full energy today, {name}. Bare minimum is a completely acceptable goal.",
     "Track your patterns — knowing your own rhythm is the real power move here."
   ];
 
   function randomTip(){
-    return binnieTips[Math.floor(Math.random()*binnieTips.length)];
+    const tip = binnieTips[Math.floor(Math.random()*binnieTips.length)];
+    return tip.replace('{name}', getName() || 'bestie');
   }
   document.getElementById('binnieTip').textContent = randomTip();
   document.getElementById('binnieBtn').addEventListener('click', ()=>{
@@ -485,6 +564,92 @@
   document.getElementById('helpBtn').addEventListener('click', ()=> helpOverlay.classList.add('show'));
   document.getElementById('closeHelp').addEventListener('click', ()=> helpOverlay.classList.remove('show'));
   helpOverlay.addEventListener('click', (e)=>{ if(e.target === helpOverlay) helpOverlay.classList.remove('show'); });
+
+  // ---------------- app version ----------------
+  const APP_VERSION = 'v1.5.0';
+  document.getElementById('versionTag').textContent = APP_VERSION;
+
+  // ---------------- user's name ----------------
+  const NAME_KEY = 'binnieClinicName';
+  function getName(){ return (localStorage.getItem(NAME_KEY) || '').trim(); }
+  function setName(name){
+    try{ localStorage.setItem(NAME_KEY, name.trim()); }catch(e){}
+  }
+  function applyGreeting(){
+    const name = getName();
+    const subtitle = document.getElementById('subtitle');
+    subtitle.textContent = name
+      ? `hey ${name} 💗 a lil STAY-coded diary for your cycle · created by Tulika (@minberrydiary)`
+      : `a lil STAY-coded diary for your cycle · created by Tulika (@minberrydiary) 💗`;
+  }
+  applyGreeting();
+
+  const namePromptOverlay = document.getElementById('namePromptOverlay');
+  if(!localStorage.getItem(NAME_KEY + 'Seen')){
+    namePromptOverlay.classList.add('show');
+  }
+  document.getElementById('saveNamePrompt').addEventListener('click', ()=>{
+    const val = document.getElementById('namePromptInput').value;
+    setName(val);
+    try{ localStorage.setItem(NAME_KEY + 'Seen', '1'); }catch(e){}
+    applyGreeting();
+    document.getElementById('nameInput').value = getName();
+    namePromptOverlay.classList.remove('show');
+    document.getElementById('binnieTip').textContent = randomTip();
+  });
+
+  // ---------------- settings modal ----------------
+  const settingsOverlay = document.getElementById('settingsOverlay');
+  const nameInput = document.getElementById('nameInput');
+  nameInput.value = getName();
+  document.getElementById('settingsBtn').addEventListener('click', ()=>{
+    nameInput.value = getName();
+    settingsOverlay.classList.add('show');
+  });
+  document.getElementById('closeSettings').addEventListener('click', ()=>{
+    setName(nameInput.value);
+    applyGreeting();
+    settingsOverlay.classList.remove('show');
+  });
+  settingsOverlay.addEventListener('click', (e)=>{
+    if(e.target === settingsOverlay){
+      setName(nameInput.value);
+      applyGreeting();
+      settingsOverlay.classList.remove('show');
+    }
+  });
+
+  // ---------------- background theme picker ----------------
+  const BG_KEY = 'binnieClinicBgTheme';
+  const bgThemeLayer = document.getElementById('bgThemeLayer');
+  const bgImages = {
+    piggy: '/assets/bg-piggy.png',
+    bunny: '/assets/bg-bunny.png',
+    penguin: '/assets/bg-penguin.png',
+    puppy: '/assets/bg-puppy.png'
+  };
+  function applyBgTheme(theme){
+    if(theme && theme !== 'emoji' && bgImages[theme]){
+      bgThemeLayer.style.backgroundImage = `url('${bgImages[theme]}')`;
+      bgThemeLayer.classList.add('show');
+      bgPattern.style.display = 'none';
+    } else {
+      bgThemeLayer.classList.remove('show');
+      bgPattern.style.display = 'block';
+    }
+    document.querySelectorAll('.bg-option').forEach(opt=>{
+      opt.classList.toggle('active', opt.dataset.bg === (theme || 'emoji'));
+    });
+  }
+  const savedBg = localStorage.getItem(BG_KEY) || 'emoji';
+  applyBgTheme(savedBg);
+  document.querySelectorAll('.bg-option').forEach(opt=>{
+    opt.addEventListener('click', ()=>{
+      const theme = opt.dataset.bg;
+      try{ localStorage.setItem(BG_KEY, theme); }catch(e){}
+      applyBgTheme(theme);
+    });
+  });
 
   // mood chips
   document.querySelectorAll('.mood-chip').forEach(chip=>{
@@ -767,10 +932,48 @@
   renderBubbles();
   window.addEventListener('resize', ()=>{ randomPositions(); renderBubbles(); });
 
-  // register service worker so the site can be installed as an app
+  // register service worker so the site can be installed as an app,
+  // and watch for updates so we can show the cute "Update now" banner
   if('serviceWorker' in navigator){
+    const updateBanner = document.getElementById('updateBanner');
+    const updateNowBtn = document.getElementById('updateNowBtn');
+    let waitingWorker = null;
+
+    function showUpdateBanner(worker){
+      waitingWorker = worker;
+      updateBanner.classList.add('show');
+    }
+
+    updateNowBtn.addEventListener('click', ()=>{
+      if(waitingWorker) waitingWorker.postMessage('SKIP_WAITING');
+      updateBanner.classList.remove('show');
+    });
+
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', ()=>{
+      if(refreshing) return;
+      refreshing = true;
+      window.location.reload();
+    });
+
     window.addEventListener('load', ()=>{
-      navigator.serviceWorker.register('/sw.js').catch(()=>{});
+      navigator.serviceWorker.register('/sw.js').then(reg=>{
+        // a worker was already waiting when we loaded (e.g. update happened in another tab)
+        if(reg.waiting && navigator.serviceWorker.controller){
+          showUpdateBanner(reg.waiting);
+        }
+        reg.addEventListener('updatefound', ()=>{
+          const newWorker = reg.installing;
+          if(!newWorker) return;
+          newWorker.addEventListener('statechange', ()=>{
+            if(newWorker.state === 'installed' && navigator.serviceWorker.controller){
+              showUpdateBanner(newWorker);
+            }
+          });
+        });
+        // check for a new version every so often for anyone who keeps a tab open forever
+        setInterval(()=> reg.update().catch(()=>{}), 60 * 60 * 1000);
+      }).catch(()=>{});
     });
   }
 </script>

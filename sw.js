@@ -1,11 +1,32 @@
-const CACHE_NAME = 'binnie-clinic-v2';
-const STATIC_ASSETS = ['/icon-192.png', '/icon-512.png', '/manifest.json'];
+// Bump this on every deploy so the browser knows a new version exists.
+// Old caches (anything not matching CACHE_NAME) get wiped in 'activate' below.
+const CACHE_NAME = 'binnie-clinic-v3';
+
+const STATIC_ASSETS = [
+  '/icon-192.png',
+  '/icon-512.png',
+  '/apple-touch-icon.png',
+  '/manifest.json',
+  '/assets/bg-piggy.png',
+  '/assets/bg-bunny.png',
+  '/assets/bg-penguin.png',
+  '/assets/bg-puppy.png'
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
   );
-  self.skipWaiting();
+  // NOTE: no self.skipWaiting() here on purpose — we want this worker to sit
+  // in "waiting" so index.html can show the "Update now" banner and let the
+  // user choose when to swap over, instead of yanking the rug mid-use.
+});
+
+// index.html sends this once the person taps "Update now"
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('activate', (event) => {
@@ -29,7 +50,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // For static assets (icons, manifest): cache-first is fine, they rarely change.
+  // For static assets (icons, manifest, backgrounds): cache-first is fine, they rarely change.
   event.respondWith(
     caches.match(req).then((cached) => cached || fetch(req))
   );
