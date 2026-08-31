@@ -1,16 +1,16 @@
 // Bump this on every deploy so the browser knows a new version exists.
 // Old caches (anything not matching CACHE_NAME) get wiped in 'activate' below.
-const CACHE_NAME = 'binnie-clinic-v3';
+const CACHE_NAME = 'binnie-clinic-v4';
 
 const STATIC_ASSETS = [
   '/icon-192.png',
   '/icon-512.png',
   '/apple-touch-icon.png',
   '/manifest.json',
-  '/assets/bg-piggy.png',
-  '/assets/bg-bunny.png',
-  '/assets/bg-penguin.png',
-  '/assets/bg-puppy.png'
+  '/bg-piggy.png',
+  '/bg-bunny.png',
+  '/bg-penguin.png',
+  '/bg-puppy.png'
 ];
 
 self.addEventListener('install', (event) => {

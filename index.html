@@ -483,10 +483,10 @@
     <h3>Background</h3>
     <div class="bg-picker" id="bgPicker">
       <div class="bg-option" data-bg="emoji"><div class="bg-swatch bg-swatch-emoji">🐤🍓🧀</div><span>Classic</span></div>
-      <div class="bg-option" data-bg="piggy"><div class="bg-swatch" style="background-image:url('/assets/bg-piggy.png')"></div><span>Piggy</span></div>
-      <div class="bg-option" data-bg="bunny"><div class="bg-swatch" style="background-image:url('/assets/bg-bunny.png')"></div><span>Bunny</span></div>
-      <div class="bg-option" data-bg="penguin"><div class="bg-swatch" style="background-image:url('/assets/bg-penguin.png')"></div><span>Binnie</span></div>
-      <div class="bg-option" data-bg="puppy"><div class="bg-swatch" style="background-image:url('/assets/bg-puppy.png')"></div><span>Puppy</span></div>
+      <div class="bg-option" data-bg="piggy"><div class="bg-swatch" style="background-image:url('/bg-piggy.png')"></div><span>Piggy</span></div>
+      <div class="bg-option" data-bg="bunny"><div class="bg-swatch" style="background-image:url('/bg-bunny.png')"></div><span>Bunny</span></div>
+      <div class="bg-option" data-bg="penguin"><div class="bg-swatch" style="background-image:url('/bg-penguin.png')"></div><span>Binnie</span></div>
+      <div class="bg-option" data-bg="puppy"><div class="bg-swatch" style="background-image:url('/bg-puppy.png')"></div><span>Puppy</span></div>
     </div>
 
     <div class="modal-note" id="aboutNote">Binnie Clinic <span id="versionTag"></span> 🐷</div>
@@ -566,7 +566,7 @@
   helpOverlay.addEventListener('click', (e)=>{ if(e.target === helpOverlay) helpOverlay.classList.remove('show'); });
 
   // ---------------- app version ----------------
-  const APP_VERSION = 'v1.5.0';
+  const APP_VERSION = 'v1.5.1';
   document.getElementById('versionTag').textContent = APP_VERSION;
 
   // ---------------- user's name ----------------
@@ -623,10 +623,10 @@
   const BG_KEY = 'binnieClinicBgTheme';
   const bgThemeLayer = document.getElementById('bgThemeLayer');
   const bgImages = {
-    piggy: '/assets/bg-piggy.png',
-    bunny: '/assets/bg-bunny.png',
-    penguin: '/assets/bg-penguin.png',
-    puppy: '/assets/bg-puppy.png'
+    piggy: '/bg-piggy.png',
+    bunny: '/bg-bunny.png',
+    penguin: '/bg-penguin.png',
+    puppy: '/bg-puppy.png'
   };
   function applyBgTheme(theme){
     if(theme && theme !== 'emoji' && bgImages[theme]){
