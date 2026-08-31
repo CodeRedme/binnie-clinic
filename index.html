@@ -248,9 +248,10 @@
 
   .toast{
     position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(120%);
-    background:var(--accent-dark); color:#fff; padding:12px 22px; border-radius:16px;
+    background:var(--accent-dark); color:#fff; padding:14px 22px; border-radius:16px;
     font-family:'Baloo 2',sans-serif; font-weight:600; font-size:.85rem; z-index:50;
     transition: transform .3s ease; box-shadow:0 8px 20px rgba(0,0,0,.2);
+    max-width:calc(100% - 40px); width:340px; text-align:center; line-height:1.5;
   }
   .toast.show{ transform:translateX(-50%) translateY(0); }
 
@@ -307,6 +308,69 @@
   .update-banner button{
     flex:none; min-width:auto; padding:8px 14px; font-size:.78rem; margin:0;
   }
+
+  /* ---------- dwaekki speech bubble ---------- */
+  .dwaekki-bubble{
+    display:flex; align-items:center; gap:10px; background:var(--soft);
+    border:1.5px solid var(--border); border-radius:18px; padding:10px 14px;
+    margin:0 0 18px; font-size:.85rem; color:var(--text); transition: opacity .3s ease;
+  }
+  .dwaekki-bubble img{ width:32px; height:32px; border-radius:50%; flex:none; border:2px solid var(--accent); }
+  .dwaekki-bubble b{ font-family:'Baloo 2', sans-serif; color:var(--accent-dark); }
+
+  /* ---------- welcome check-in card ---------- */
+  .welcome-text{ font-size:.9rem; line-height:1.6; margin:0 0 12px; }
+  .checkin-label{ font-size:.85rem; font-weight:700; color:var(--text); margin:14px 0 8px; }
+  .checkin-response{
+    margin-top:14px; background:var(--soft); border-radius:14px; padding:12px 14px;
+    font-size:.85rem; line-height:1.5; color:var(--text);
+  }
+  .checkin-response b{ font-family:'Baloo 2', sans-serif; color:var(--accent-dark); }
+
+  /* ---------- cycle overview + timeline ---------- */
+  .cycle-overview{ margin-top:16px; font-size:.85rem; line-height:1.9; color:var(--text); }
+  .cycle-overview b{ color:var(--accent-dark); }
+  .cycle-timeline{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-top:14px; padding:12px 6px; background:var(--soft); border-radius:14px;
+  }
+  .cycle-timeline .stage{
+    display:flex; flex-direction:column; align-items:center; gap:4px; font-size:1.1rem;
+    opacity:.4; flex:1; position:relative;
+  }
+  .cycle-timeline .stage.active{ opacity:1; transform:scale(1.15); }
+  .cycle-timeline .stage span.lbl{ font-size:.6rem; color:var(--muted); font-weight:600; }
+  .cycle-timeline .connector{ flex:1; height:2px; background:var(--border); margin-top:-14px; }
+  .predict-disclaimer{ font-size:.72rem; opacity:.8; margin-top:6px; display:block; }
+
+  /* ---------- symptom-based binnie tips ---------- */
+  .binnie-symptom-grid{ display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 4px; }
+  .binnie-symptom-chip{
+    border:1.5px solid var(--border); background:var(--card); border-radius:14px;
+    padding:7px 12px; font-size:.78rem; cursor:pointer; color:var(--text);
+  }
+  .binnie-symptom-chip.active{ background:var(--accent); border-color:var(--accent); color:#fff; }
+
+  /* ---------- diary-style entries ---------- */
+  .diary-lock-note{ font-size:.75rem; color:var(--muted); margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+  .diary-date{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:.9rem; color:var(--accent-dark); margin:16px 0 8px; }
+  .diary-date:first-child{ margin-top:0; }
+  .diary-entry{
+    border:1.5px solid var(--border); border-radius:16px; padding:12px 14px; margin-bottom:10px;
+    background:var(--bg); font-size:.85rem; line-height:1.7;
+  }
+  .diary-entry .diary-actions{ display:flex; gap:10px; margin-top:8px; }
+  .diary-entry .diary-actions button{
+    flex:none; min-width:auto; padding:5px 10px; font-size:.72rem; background:var(--soft); color:var(--accent-dark);
+  }
+
+  /* ---------- night clinic banner ---------- */
+  .night-banner{
+    display:none; background:linear-gradient(135deg, var(--dark-accent-dark) 0%, #4A1B2C 100%);
+    color:#fff; border-radius:18px; padding:14px 18px; margin-bottom:22px; font-size:.85rem; line-height:1.5;
+  }
+  .night-banner.show{ display:block; }
+  .night-banner b{ font-family:'Baloo 2', sans-serif; }
 </style>
 </head>
 <body data-theme="light">
@@ -324,9 +388,34 @@
   <h1 class="title"><img class="title-icon" src="/icon-192.png" alt="Binnie Clinic"> Binnie Clinic</h1>
   <p class="subtitle" id="subtitle">a lil STAY-coded diary for your cycle · created by Tulika (@minberrydiary) 💗</p>
 
+  <div class="dwaekki-bubble" id="dwaekkiBubble">
+    <img src="/icon-192.png" alt="Dwaekki">
+    <div><b>Dwaekki:</b> <span id="dwaekkiText">STAY! You're here!! 🐰</span></div>
+  </div>
+
+  <div class="night-banner" id="nightBanner">
+    <b>🌙 Night Clinic is open.</b> You've done enough for today. Rest is allowed. 🐰💗
+  </div>
+
   <div class="help-row">
     <button class="help-btn" id="helpBtn" type="button">Need Help? 🐰</button>
     <button class="help-btn" id="settingsBtn" type="button">⚙️ Settings</button>
+  </div>
+
+  <!-- WELCOME CHECK-IN -->
+  <div class="card">
+    <div class="section-label">🩷 Welcome back, STAY!</div>
+    <p class="welcome-text">Binnie Clinic is your little space to check in, track your cycle, and take a moment for yourself.</p>
+    <div class="checkin-label">How are you feeling today?</div>
+    <div class="mood-grid" id="checkinMoodGrid">
+      <div class="mood-chip" data-mood="😊 Good">😊 Good</div>
+      <div class="mood-chip" data-mood="😐 Meh">😐 Meh</div>
+      <div class="mood-chip" data-mood="🥺 Low">🥺 Low</div>
+      <div class="mood-chip" data-mood="😤 Irritable">😤 Irritable</div>
+      <div class="mood-chip" data-mood="😴 Tired">😴 Tired</div>
+      <div class="mood-chip" data-mood="🥰 Soft">🥰 Soft</div>
+    </div>
+    <div class="checkin-response" id="checkinResponse" style="display:none;"></div>
   </div>
 
   <!-- STATS + PREDICTION -->
@@ -337,6 +426,19 @@
       <div class="stat"><div class="num" id="statAvgCycle">–</div><div class="lbl">avg cycle (days)</div></div>
       <div class="stat"><div class="num" id="statTopMood">–</div><div class="lbl">top mood</div></div>
     </div>
+
+    <div class="cycle-overview" id="cycleOverview"></div>
+
+    <div class="cycle-timeline" id="cycleTimeline">
+      <div class="stage" data-stage="period"><span>🩸</span><span class="lbl">Period</span></div>
+      <div class="connector"></div>
+      <div class="stage" data-stage="follicular"><span>🌱</span><span class="lbl">Follicular</span></div>
+      <div class="connector"></div>
+      <div class="stage" data-stage="fertile"><span>🌸</span><span class="lbl">Fertile</span></div>
+      <div class="connector"></div>
+      <div class="stage" data-stage="luteal"><span>✨</span><span class="lbl">Luteal</span></div>
+    </div>
+
     <div class="predict-banner" id="predictBanner">
       Log a couple entries and I'll start predicting your next cycle 🔮
     </div>
@@ -348,9 +450,17 @@
     <div class="binnie-card">
       <div class="binnie-avatar"><img src="/icon-192.png" alt="Dr. Binnie"></div>
       <div class="binnie-text">
-        <b>Dr. Binnie says:</b>
+        <b>What's bothering you today?</b>
+        <div class="binnie-symptom-grid" id="binnieSymptomGrid">
+          <div class="binnie-symptom-chip" data-s="cramps">😣 Cramps</div>
+          <div class="binnie-symptom-chip" data-s="fatigue">😴 Fatigue</div>
+          <div class="binnie-symptom-chip" data-s="headache">🤕 Headache</div>
+          <div class="binnie-symptom-chip" data-s="cravings">🍫 Cravings</div>
+          <div class="binnie-symptom-chip" data-s="nausea">😵 Nausea</div>
+          <div class="binnie-symptom-chip" data-s="mood">💭 Mood</div>
+        </div>
         <p id="binnieTip">Loading today's advice...</p>
-        <div class="binnie-refresh"><button id="binnieBtn" class="secondary" type="button">New tip 🔁</button></div>
+        <div class="binnie-refresh"><button id="binnieBtn" class="secondary" type="button">🎲 Give me a random tip</button></div>
       </div>
     </div>
   </div>
@@ -404,7 +514,8 @@
 
   <!-- ENTRIES -->
   <div class="card" id="entriesCard" style="display:none;">
-    <div class="section-label">📖 All Entries</div>
+    <div class="section-label">📋 My Clinic Diary</div>
+    <div class="diary-lock-note">🔒 Stored on this device only — never uploaded anywhere</div>
     <div id="entriesList"></div>
   </div>
 
@@ -490,6 +601,7 @@
       <div class="bg-option" data-bg="bunny"><div class="bg-swatch" style="background-image:url('/bg-bunny.png')"></div><span>Bunny</span></div>
       <div class="bg-option" data-bg="penguin"><div class="bg-swatch" style="background-image:url('/bg-penguin.png')"></div><span>Binnie</span></div>
       <div class="bg-option" data-bg="puppy"><div class="bg-swatch" style="background-image:url('/bg-puppy.png')"></div><span>Puppy</span></div>
+      <div class="bg-option" data-bg="piggy"><div class="bg-swatch" style="background-image:url('/bg-piggy.png')"></div><span>Dwaekki</span></div>
     </div>
 
     <div class="modal-note" id="aboutNote">Binnie Clinic <span id="versionTag"></span> 🐷</div>
@@ -560,14 +672,114 @@
     "Track your patterns — knowing your own rhythm is the real power move here."
   ];
 
-  function randomTip(){
-    const tip = binnieTips[Math.floor(Math.random()*binnieTips.length)];
-    return tip.replace('{name}', getName() || 'bestie');
+  const symptomTips = {
+    cramps: "A heating pad or hot water bottle on your lower belly, plus some gentle stretching, can take the edge off cramps. Rest is genuinely part of the treatment.",
+    fatigue: "Feeling tired today? A little rest, hydration, and something nourishing might help more than pushing through. Nap time is productive time.",
+    headache: "Headaches during your cycle are common — water, a dim quiet room, and a short lie-down can help. If it's severe or won't let up, that's worth mentioning to a doctor.",
+    cravings: "Cravings hitting? Chocolate is basically a certified mood stabilizer today, go for it — your body's just asking for a little extra energy right now.",
+    nausea: "Nausea can happen around your cycle too. Small, bland snacks (crackers, toast) and sipping water slowly usually help more than a big meal.",
+    mood: "Mood swings are so normal here, {name}. Be gentle with yourself — you're not 'too much,' your hormones are just doing a lot of work this week."
+  };
+
+  function personalize(text){
+    return text.replace('{name}', getName() || 'bestie');
   }
+
+  function randomTip(){
+    return personalize(binnieTips[Math.floor(Math.random()*binnieTips.length)]);
+  }
+
+  let selectedBinnieSymptoms = new Set();
   document.getElementById('binnieTip').textContent = randomTip();
   document.getElementById('binnieBtn').addEventListener('click', ()=>{
+    document.querySelectorAll('.binnie-symptom-chip').forEach(c=>c.classList.remove('active'));
+    selectedBinnieSymptoms.clear();
     document.getElementById('binnieTip').textContent = randomTip();
   });
+
+  document.querySelectorAll('.binnie-symptom-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      chip.classList.toggle('active');
+      const s = chip.dataset.s;
+      if(selectedBinnieSymptoms.has(s)) selectedBinnieSymptoms.delete(s);
+      else selectedBinnieSymptoms.add(s);
+
+      if(selectedBinnieSymptoms.size){
+        const picked = Array.from(selectedBinnieSymptoms).map(s => personalize(symptomTips[s]));
+        document.getElementById('binnieTip').textContent = picked.join(' ');
+      } else {
+        document.getElementById('binnieTip').textContent = randomTip();
+      }
+    });
+  });
+
+  // ---------------- Day/Night Clinic theme (persisted, time-based default) ----------------
+  const THEME_KEY = 'binnieClinicTheme';
+  function applyTheme(theme){
+    document.body.dataset.theme = theme;
+    document.getElementById('toggleBtn').textContent = theme === 'dark' ? '🌙 Night Clinic' : '☀️ Day Clinic';
+    document.getElementById('nightBanner').classList.toggle('show', theme === 'dark');
+    updateDwaekki();
+  }
+  let savedTheme = localStorage.getItem(THEME_KEY);
+  if(!savedTheme){
+    const hour = new Date().getHours();
+    savedTheme = (hour >= 19 || hour < 6) ? 'dark' : 'light';
+  }
+  applyTheme(savedTheme);
+
+  document.getElementById('toggleBtn').addEventListener('click', ()=>{
+    const isDark = document.body.dataset.theme === 'dark';
+    const newTheme = isDark ? 'light' : 'dark';
+    try{ localStorage.setItem(THEME_KEY, newTheme); }catch(e){}
+    applyTheme(newTheme);
+  });
+
+  // ---------------- Dwaekki personality ----------------
+  function updateDwaekki(){
+    const el = document.getElementById('dwaekkiText');
+    if(!el) return;
+    const isDark = document.body.dataset.theme === 'dark';
+    if(isDark){
+      el.textContent = "It's late... go rest, STAY. 😴";
+    } else if(!entries.length){
+      el.textContent = "No clinic diary entry yet... 👀";
+    } else {
+      el.textContent = "STAY! You're here!! 🐰";
+    }
+  }
+  function dwaekkiSay(msg, revertMs){
+    const el = document.getElementById('dwaekkiText');
+    if(!el) return;
+    el.textContent = msg;
+    if(revertMs) setTimeout(updateDwaekki, revertMs);
+  }
+
+  // ---------------- welcome check-in ----------------
+  const CHECKIN_KEY = 'binnieClinicCheckin';
+  function todayStr(){ return new Date().toISOString().slice(0,10); }
+  function showCheckinResponse(){
+    const resp = document.getElementById('checkinResponse');
+    resp.style.display = 'block';
+    resp.innerHTML = `<b>Dr. Binnie has noted that.</b> 🩷<br>Be gentle with yourself today, okay?`;
+  }
+  document.querySelectorAll('#checkinMoodGrid .mood-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('#checkinMoodGrid .mood-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      try{ localStorage.setItem(CHECKIN_KEY, JSON.stringify({ date: todayStr(), mood: chip.dataset.mood })); }catch(e){}
+      showCheckinResponse();
+    });
+  });
+  try{
+    const savedCheckin = JSON.parse(localStorage.getItem(CHECKIN_KEY) || 'null');
+    if(savedCheckin && savedCheckin.date === todayStr()){
+      document.querySelectorAll('#checkinMoodGrid .mood-chip').forEach(c=>{
+        if(c.dataset.mood === savedCheckin.mood) c.classList.add('active');
+      });
+      showCheckinResponse();
+    }
+  }catch(e){}
 
   // help modal
   const helpOverlay = document.getElementById('helpOverlay');
@@ -576,7 +788,7 @@
   helpOverlay.addEventListener('click', (e)=>{ if(e.target === helpOverlay) helpOverlay.classList.remove('show'); });
 
   // ---------------- app version ----------------
-  const APP_VERSION = 'v1.5.5';
+  const APP_VERSION = 'v1.6.0';
   document.getElementById('versionTag').textContent = APP_VERSION;
 
   // ---------------- user's name: greeting + first-visit prompt ----------------
@@ -630,7 +842,8 @@
   const bgImages = {
     bunny: '/bg-bunny.png',
     penguin: '/bg-penguin.png',
-    puppy: '/bg-puppy.png'
+    puppy: '/bg-puppy.png',
+    piggy: '/bg-piggy.png'
   };
   function applyBgTheme(theme){
     if(theme && theme !== 'emoji' && bgImages[theme]){
@@ -655,10 +868,10 @@
     });
   });
 
-  // mood chips
-  document.querySelectorAll('.mood-chip').forEach(chip=>{
+  // mood chips (Log Today form only — checkin mood grid is wired separately above)
+  document.querySelectorAll('#moodGrid .mood-chip').forEach(chip=>{
     chip.addEventListener('click', ()=>{
-      document.querySelectorAll('.mood-chip').forEach(c=>c.classList.remove('active'));
+      document.querySelectorAll('#moodGrid .mood-chip').forEach(c=>c.classList.remove('active'));
       chip.classList.add('active');
       selectedMood = chip.dataset.mood;
     });
@@ -676,9 +889,9 @@
 
   function showToast(msg){
     const t = document.getElementById('toast');
-    t.textContent = msg;
+    t.innerHTML = msg;
     t.classList.add('show');
-    setTimeout(()=> t.classList.remove('show'), 2200);
+    setTimeout(()=> t.classList.remove('show'), 2800);
   }
 
   function updateStats(){
@@ -688,23 +901,66 @@
     const avg = cycleLens.length ? Math.round(cycleLens.reduce((a,b)=>a+b,0)/cycleLens.length) : null;
     document.getElementById('statAvgCycle').textContent = avg ?? '–';
 
+    const periodLens = entries.map(e=>parseInt(e.periodLength)).filter(n=>!isNaN(n));
+    const avgPeriod = periodLens.length ? Math.round(periodLens.reduce((a,b)=>a+b,0)/periodLens.length) : null;
+
     const moodCounts = {};
     entries.forEach(e=>{ if(e.mood) moodCounts[e.mood] = (moodCounts[e.mood]||0)+1; });
     const topMood = Object.keys(moodCounts).sort((a,b)=>moodCounts[b]-moodCounts[a])[0];
     document.getElementById('statTopMood').textContent = topMood ? topMood.split(' ')[0] : '–';
 
-    const banner = document.getElementById('predictBanner');
     const dated = entries.filter(e=>e.startDate).sort((a,b)=> new Date(b.startDate) - new Date(a.startDate));
+
+    // ---- cycle overview ----
+    let currentDay = null;
+    if(dated.length){
+      const start = new Date(dated[0].startDate + 'T00:00:00');
+      const today = new Date();
+      const diffDays = Math.floor((today - start) / 86400000) + 1;
+      if(diffDays > 0) currentDay = diffDays;
+    }
+    const overviewEl = document.getElementById('cycleOverview');
+    overviewEl.innerHTML =
+      (currentDay ? `📅 Current cycle: <b>Day ${currentDay}</b><br>` : '') +
+      `🔁 Average cycle: <b>${avg ?? '–'} days</b><br>` +
+      `🩸 Average period: <b>${avgPeriod ?? '–'} days</b><br>` +
+      `📋 Entries: <b>${entries.length}</b>`;
+
+    // ---- visual timeline ----
+    document.querySelectorAll('.cycle-timeline .stage').forEach(s=>s.classList.remove('active'));
+    if(currentDay && dated.length){
+      const pLen = parseInt(dated[0].periodLength) || 5;
+      const cLen = parseInt(dated[0].cycleLength) || 28;
+      let stage = 'luteal';
+      if(currentDay <= pLen) stage = 'period';
+      else if(currentDay <= Math.round(cLen*0.45)) stage = 'follicular';
+      else if(currentDay <= Math.round(cLen*0.6)) stage = 'fertile';
+      const activeEl = document.querySelector(`.cycle-timeline .stage[data-stage="${stage}"]`);
+      if(activeEl) activeEl.classList.add('active');
+    }
+
+    // ---- prediction banner ----
+    const banner = document.getElementById('predictBanner');
     if(dated.length){
       const latest = dated[0];
       const cLen = parseInt(latest.cycleLength) || 28;
-      const nextDate = new Date(latest.startDate);
+      const nextDate = new Date(latest.startDate + 'T00:00:00');
       nextDate.setDate(nextDate.getDate() + cLen);
       const opts = { month:'short', day:'numeric' };
-      banner.innerHTML = `<b>🔮 Next period estimate:</b> ${nextDate.toLocaleDateString('en-US', opts)} <br><span style="opacity:.85; font-size:.8rem;">based on your last logged start date + ${cLen}-day cycle. Rough estimate, not medical advice.</span>`;
+      banner.innerHTML = `<b>🔮 Estimated next period:</b> ${nextDate.toLocaleDateString('en-US', opts)}<span class="predict-disclaimer">Predictions are estimates and may not always be accurate.</span>`;
     } else {
       banner.textContent = "Log a couple entries and I'll start predicting your next cycle 🔮";
     }
+
+    updateDwaekki();
+  }
+
+  let editingId = null;
+
+  function formatDateLong(dateStr){
+    if(!dateStr) return 'No date';
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
   }
 
   function renderEntries(){
@@ -715,11 +971,17 @@
     }
     list.innerHTML = entries.slice().reverse().map(e=>{
       const tags = e.symptoms.length ? e.symptoms.map(s=>`<span class="tag">${s}</span>`).join('') : '';
-      return `<div class="entry">
-        <div class="row1"><span>${e.startDate || 'No date'} · ${e.mood || 'No mood set'}</span><span style="display:flex; align-items:center; gap:8px;">${e.periodLength ? e.periodLength+'d period' : ''}<button class="delete-entry" data-id="${e.id}" title="Delete this entry" type="button">🗑️</button></span></div>
-        <div class="row2">${e.notes || 'No notes'}</div>
-        ${tags ? `<div class="tags">${tags}</div>` : ''}
-      </div>`;
+      return `<div class="diary-date">${formatDateLong(e.startDate)}</div>
+        <div class="diary-entry">
+          🌸 Mood: ${e.mood || 'Not set'}<br>
+          🩷 Symptoms: ${e.symptoms.length ? e.symptoms.join(' · ') : 'None logged'}<br>
+          📝 Notes: ${e.notes || 'No notes'}
+          ${tags ? `<div class="tags">${tags}</div>` : ''}
+          <div class="diary-actions">
+            <button class="edit-entry" data-id="${e.id}" type="button">Edit ✏️</button>
+            <button class="delete-entry" data-id="${e.id}" type="button">Delete 🗑️</button>
+          </div>
+        </div>`;
     }).join('');
 
     list.querySelectorAll('.delete-entry').forEach(btn=>{
@@ -733,11 +995,34 @@
         showToast('Entry deleted 🗑️');
       });
     });
+
+    list.querySelectorAll('.edit-entry').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const id = btn.dataset.id;
+        const entry = entries.find(e => String(e.id) === id);
+        if(!entry) return;
+        editingId = id;
+        document.getElementById('startDate').value = entry.startDate || '';
+        document.getElementById('periodLength').value = entry.periodLength || '';
+        document.getElementById('cycleLength').value = entry.cycleLength || '28';
+        document.getElementById('notes').value = entry.notes || '';
+        document.querySelectorAll('#moodGrid .mood-chip').forEach(c=>{
+          c.classList.toggle('active', c.dataset.mood === entry.mood);
+        });
+        selectedMood = entry.mood;
+        selectedSymptoms = new Set(entry.symptoms || []);
+        document.querySelectorAll('#symptomGrid .symptom-chip').forEach(c=>{
+          c.classList.toggle('active', selectedSymptoms.has(c.dataset.symptom));
+        });
+        document.getElementById('saveBtn').textContent = '💾 Update Entry';
+        document.getElementById('entriesCard').style.display = 'none';
+        document.getElementById('startDate').closest('.card').scrollIntoView({ behavior:'smooth' });
+      });
+    });
   }
 
   document.getElementById('saveBtn').addEventListener('click', ()=>{
-    const entry = {
-      id: Date.now() + '-' + Math.random().toString(36).slice(2,8),
+    const entryData = {
       startDate: document.getElementById('startDate').value,
       periodLength: document.getElementById('periodLength').value,
       cycleLength: document.getElementById('cycleLength').value || '28',
@@ -745,19 +1030,32 @@
       symptoms: Array.from(selectedSymptoms),
       notes: document.getElementById('notes').value
     };
-    entries.push(entry);
+
+    if(editingId){
+      const idx = entries.findIndex(e => String(e.id) === editingId);
+      if(idx > -1) entries[idx] = { ...entries[idx], ...entryData };
+      editingId = null;
+      document.getElementById('saveBtn').textContent = '💾 Save Entry';
+      showToast('💗 Entry updated!');
+    } else {
+      entries.push({ id: Date.now() + '-' + Math.random().toString(36).slice(2,8), ...entryData });
+      showToast('💗 Entry tucked safely into your clinic diary!<br><span style="font-weight:400; font-size:.78rem;">Binnie has added today\'s note to your records. 🐰📋</span>');
+    }
+
     saveEntries();
     updateStats();
-    renderEntries();
-    showToast('Saved! 💾');
+    dwaekkiSay('Entry saved! Good job taking a moment for yourself. 💗', 4000);
 
     document.getElementById('startDate').value='';
     document.getElementById('periodLength').value='';
     document.getElementById('notes').value='';
-    document.querySelectorAll('.mood-chip').forEach(c=>c.classList.remove('active'));
-    document.querySelectorAll('.symptom-chip').forEach(c=>c.classList.remove('active'));
+    document.querySelectorAll('#moodGrid .mood-chip').forEach(c=>c.classList.remove('active'));
+    document.querySelectorAll('#symptomGrid .symptom-chip').forEach(c=>c.classList.remove('active'));
     selectedMood = null;
     selectedSymptoms.clear();
+
+    document.getElementById('entriesCard').style.display = 'block';
+    renderEntries();
   });
 
   document.getElementById('viewBtn').addEventListener('click', ()=>{
@@ -765,12 +1063,6 @@
     const isHidden = card.style.display === 'none';
     card.style.display = isHidden ? 'block' : 'none';
     if(isHidden) renderEntries();
-  });
-
-  document.getElementById('toggleBtn').addEventListener('click', ()=>{
-    const body = document.body;
-    const isDark = body.dataset.theme === 'dark';
-    body.dataset.theme = isDark ? 'light' : 'dark';
   });
 
   updateStats();
