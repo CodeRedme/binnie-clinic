@@ -537,6 +537,13 @@
   let selectedMood = null;
   let selectedSymptoms = new Set();
 
+  // ---------------- user's name (declared early so randomTip() below can use it) ----------------
+  const NAME_KEY = 'binnieClinicName';
+  function getName(){ return (localStorage.getItem(NAME_KEY) || '').trim(); }
+  function setName(name){
+    try{ localStorage.setItem(NAME_KEY, name.trim()); }catch(e){}
+  }
+
   const binnieTips = [
     "Heating pad on low + oversized hoodie = instant STAY-approved comfort. No notes.",
     "Cravings hitting? Chocolate is basically a certified mood stabilizer today, go for it.",
@@ -566,15 +573,10 @@
   helpOverlay.addEventListener('click', (e)=>{ if(e.target === helpOverlay) helpOverlay.classList.remove('show'); });
 
   // ---------------- app version ----------------
-  const APP_VERSION = 'v1.5.1';
+  const APP_VERSION = 'v1.5.2';
   document.getElementById('versionTag').textContent = APP_VERSION;
 
-  // ---------------- user's name ----------------
-  const NAME_KEY = 'binnieClinicName';
-  function getName(){ return (localStorage.getItem(NAME_KEY) || '').trim(); }
-  function setName(name){
-    try{ localStorage.setItem(NAME_KEY, name.trim()); }catch(e){}
-  }
+  // ---------------- user's name: greeting + first-visit prompt ----------------
   function applyGreeting(){
     const name = getName();
     const subtitle = document.getElementById('subtitle');
