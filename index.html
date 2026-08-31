@@ -137,7 +137,9 @@
     font-family:'Baloo 2', sans-serif; font-weight:800;
     text-align:center; font-size:2.1rem; letter-spacing:.5px;
     color:var(--accent-dark); margin:0 0 4px;
+    display:flex; align-items:center; justify-content:center; gap:10px;
   }
+  .title-icon{ width:1.15em; height:1.15em; border-radius:50%; object-fit:cover; flex:none; }
   .subtitle{ text-align:center; color:var(--muted); margin:0 0 20px; font-size:.95rem; }
 
   .help-row{ display:flex; justify-content:center; gap:10px; margin-bottom:28px; flex-wrap:wrap; }
@@ -218,7 +220,9 @@
     width:54px; height:54px; border-radius:50%; flex-shrink:0;
     background: var(--card); border:2px solid var(--accent);
     display:flex; align-items:center; justify-content:center; font-size:1.5rem;
+    overflow:hidden;
   }
+  .binnie-avatar img{ width:100%; height:100%; object-fit:cover; }
   .binnie-text b{ font-family:'Baloo 2', sans-serif; color:var(--accent-dark); }
   .binnie-text p{ margin:6px 0 0; font-size:.9rem; line-height:1.55; }
   .binnie-refresh{ margin-top:10px; }
@@ -317,7 +321,7 @@
 
 <div class="wrap">
 
-  <h1 class="title">🐰 Binnie Clinic</h1>
+  <h1 class="title"><img class="title-icon" src="/icon-192.png" alt="Binnie Clinic"> Binnie Clinic</h1>
   <p class="subtitle" id="subtitle">a lil STAY-coded diary for your cycle · created by Tulika (@minberrydiary) 💗</p>
 
   <div class="help-row">
@@ -342,7 +346,7 @@
   <div class="card">
     <div class="section-label">🩺 Dr. Binnie's Corner</div>
     <div class="binnie-card">
-      <div class="binnie-avatar">🐰</div>
+      <div class="binnie-avatar"><img src="/icon-192.png" alt="Dr. Binnie"></div>
       <div class="binnie-text">
         <b>Dr. Binnie says:</b>
         <p id="binnieTip">Loading today's advice...</p>
@@ -572,7 +576,7 @@
   helpOverlay.addEventListener('click', (e)=>{ if(e.target === helpOverlay) helpOverlay.classList.remove('show'); });
 
   // ---------------- app version ----------------
-  const APP_VERSION = 'v1.5.4';
+  const APP_VERSION = 'v1.5.5';
   document.getElementById('versionTag').textContent = APP_VERSION;
 
   // ---------------- user's name: greeting + first-visit prompt ----------------
