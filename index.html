@@ -371,6 +371,20 @@
   }
   .night-banner.show{ display:block; }
   .night-banner b{ font-family:'Baloo 2', sans-serif; }
+
+  /* ---------- privacy ---------- */
+  .privacy-box{
+    background:var(--soft); border:1.5px solid var(--border); border-radius:14px;
+    padding:12px 14px; margin-top:14px;
+  }
+  .privacy-title{ font-family:'Baloo 2', sans-serif; font-weight:700; color:var(--accent-dark); font-size:.88rem; margin-bottom:4px; }
+  .privacy-text{ font-size:.78rem; color:var(--muted); line-height:1.5; }
+  .privacy-list{ margin:10px 0; padding-left:20px; font-size:.85rem; color:var(--text); line-height:1.7; }
+  .privacy-warning{ font-size:.78rem; color:var(--muted); background:var(--soft); border-radius:12px; padding:10px 12px; margin-bottom:4px; }
+  .modal-close.danger{
+    background:#fff0f0; color:#c0392b; border:1.5px solid #e8a9a0;
+  }
+  button.danger{ background:#c0392b; color:#fff; }
 </style>
 </head>
 <body data-theme="light">
@@ -606,17 +620,49 @@
 
     <div class="modal-note" id="aboutNote">Binnie Clinic <span id="versionTag"></span> 🐷</div>
 
+    <h3>Privacy</h3>
+    <div class="privacy-box">
+      <div class="privacy-title">🔏 Your data stays your data</div>
+      <div class="privacy-text">Nothing you enter here is uploaded or stored on our servers. Everything lives in this browser, on this device, only.</div>
+    </div>
+    <button class="modal-close danger" id="openClearData" type="button">⚠️ Clear My Data</button>
+
     <button class="modal-close" id="closeSettings" type="button">Done 🐰</button>
   </div>
 </div>
 
-<!-- FIRST-VISIT NAME PROMPT -->
+<!-- FIRST-VISIT NAME + PRIVACY PROMPT -->
 <div class="modal-overlay" id="namePromptOverlay">
   <div class="modal">
     <h2>Hi! Welcome to the clinic 🐰</h2>
-    <div class="modal-sub">Before we start, what should Dr. Binnie call you?</div>
+    <div class="modal-sub">What should we call you? 💗</div>
     <input type="text" id="namePromptInput" maxlength="20" placeholder="Your name (or leave blank)">
+
+    <div class="privacy-box">
+      <div class="privacy-title">🔏 Your data stays your data</div>
+      <div class="privacy-text">Nothing you enter here is uploaded or stored on our servers. Your name, entries, and preferences are stored locally on your device only.</div>
+    </div>
+
     <button class="modal-close" id="saveNamePrompt" type="button">Let's go 💗</button>
+  </div>
+</div>
+
+<!-- CLEAR DATA CONFIRMATION -->
+<div class="modal-overlay" id="clearDataOverlay">
+  <div class="modal">
+    <h2>Clear my data? 🥺</h2>
+    <div class="modal-sub">This will remove everything stored locally in this browser:</div>
+    <ul class="privacy-list">
+      <li>Your name</li>
+      <li>All logged cycle entries &amp; diary notes</li>
+      <li>Mood check-ins</li>
+      <li>Theme &amp; background preferences</li>
+    </ul>
+    <div class="privacy-warning">This cannot be undone unless you've exported or backed up your data yourself.</div>
+    <div class="btn-row">
+      <button class="secondary" id="cancelClearData" type="button">Cancel</button>
+      <button class="danger" id="confirmClearData" type="button">⚠️ Clear Data</button>
+    </div>
   </div>
 </div>
 
@@ -788,7 +834,7 @@
   helpOverlay.addEventListener('click', (e)=>{ if(e.target === helpOverlay) helpOverlay.classList.remove('show'); });
 
   // ---------------- app version ----------------
-  const APP_VERSION = 'v1.6.0';
+  const APP_VERSION = 'v1.7.0';
   document.getElementById('versionTag').textContent = APP_VERSION;
 
   // ---------------- user's name: greeting + first-visit prompt ----------------
@@ -813,6 +859,30 @@
     document.getElementById('nameInput').value = getName();
     namePromptOverlay.classList.remove('show');
     document.getElementById('binnieTip').textContent = randomTip();
+    const cleanName = val.trim();
+    showToast(cleanName ? `Hi, ${cleanName}! 👋` : 'Welcome! 👋');
+  });
+
+  // ---------------- privacy: clear my data ----------------
+  const clearDataOverlay = document.getElementById('clearDataOverlay');
+  document.getElementById('openClearData').addEventListener('click', ()=>{
+    settingsOverlay.classList.remove('show');
+    clearDataOverlay.classList.add('show');
+  });
+  document.getElementById('cancelClearData').addEventListener('click', ()=>{
+    clearDataOverlay.classList.remove('show');
+    settingsOverlay.classList.add('show');
+  });
+  clearDataOverlay.addEventListener('click', (e)=>{
+    if(e.target === clearDataOverlay){
+      clearDataOverlay.classList.remove('show');
+    }
+  });
+  document.getElementById('confirmClearData').addEventListener('click', ()=>{
+    const keysToClear = [STORAGE_KEY, NAME_KEY, NAME_KEY + 'Seen', THEME_KEY, CHECKIN_KEY, BG_KEY];
+    keysToClear.forEach(k=>{ try{ localStorage.removeItem(k); }catch(e){} });
+    showToast('Data cleared 🧹');
+    setTimeout(()=> window.location.reload(), 700);
   });
 
   // ---------------- settings modal ----------------

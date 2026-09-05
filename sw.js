@@ -1,6 +1,6 @@
 // Bump this on every deploy so the browser knows a new version exists.
 // Old caches (anything not matching CACHE_NAME) get wiped in 'activate' below.
-const CACHE_NAME = 'binnie-clinic-v9';
+const CACHE_NAME = 'binnie-clinic-v10';
 
 const STATIC_ASSETS = [
   '/icon-192.png',
