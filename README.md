@@ -51,7 +51,12 @@ Visit [binnie-clinic.vercel.app](https://binnie-clinic.vercel.app/) on your phon
 
 Every deploy bumps the cache version in `sw.js` (`CACHE_NAME`) and the version tag in `index.html` (`APP_VERSION`). When you have an older cached version open and a new one ships, you'll see an "Update now" banner — tap it to refresh to the latest version.
 
-Current version: **v1.5.0**
+Current version: **v1.8.0**
+
+### v1.8.0 — The Little Reminder Update
+- 🔔 Smart Reminders — optional, opt-in period / self-care / daily check-in notifications
+- 🐰 Dwaekki Reactions — Dwaekki now reacts to first visits, long absences, time of day, entries, and reminder settings
+- 🍓 Connect Corners — creator info, socials, and a "what's new" changelog
 
 ## Disclaimer
 

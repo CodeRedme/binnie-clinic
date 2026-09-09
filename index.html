@@ -385,6 +385,36 @@
     background:#fff0f0; color:#c0392b; border:1.5px solid #e8a9a0;
   }
   button.danger{ background:#c0392b; color:#fff; }
+
+  /* ---------- reminders ---------- */
+  .reminder-hint{ font-size:.75rem; color:var(--muted); margin:-4px 0 10px; }
+  .reminder-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px dashed var(--border); }
+  .reminder-row:last-of-type{ border-bottom:none; }
+  .reminder-title{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:.85rem; color:var(--text); }
+  .reminder-desc{ font-size:.75rem; color:var(--muted); margin-top:2px; }
+  .toggle-switch{
+    border:1.5px solid var(--border); background:var(--bg); color:var(--muted);
+    border-radius:20px; padding:6px 16px; font-family:'Baloo 2', sans-serif; font-weight:700;
+    font-size:.76rem; cursor:pointer; transition: all .15s; flex:none; min-width:54px;
+  }
+  .toggle-switch.on{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .reminder-sub{ font-size:.8rem; padding:2px 0 10px; color:var(--text); display:flex; align-items:center; gap:8px; }
+  .reminder-sub select, .reminder-sub input[type="time"]{
+    border:1.5px solid var(--border); border-radius:10px; padding:5px 10px;
+    font-family:'Fredoka', sans-serif; font-size:.8rem; background:var(--card); color:var(--text);
+  }
+  .reminder-note{ font-size:.75rem; color:var(--muted); background:var(--soft); border-radius:12px; padding:10px 12px; margin-top:10px; }
+
+  /* ---------- connect corners ---------- */
+  .footer-row{ display:flex; justify-content:center; margin:-10px 0 20px; }
+  .connect-card{ background:var(--soft); border:1.5px solid var(--border); border-radius:16px; padding:14px 16px; margin:12px 0; }
+  .connect-card-title{ font-family:'Baloo 2', sans-serif; font-weight:700; color:var(--accent-dark); font-size:.9rem; margin-bottom:6px; }
+  .connect-text{ font-size:.82rem; color:var(--text); line-height:1.6; margin:0 0 8px; }
+  .connect-links{ display:flex; flex-direction:column; gap:6px; margin-bottom:8px; }
+  .connect-links a{ font-size:.8rem; color:var(--accent-dark); text-decoration:none; font-weight:600; }
+  .connect-links a:hover{ text-decoration:underline; }
+  .connect-signoff{ font-size:.78rem; color:var(--muted); font-style:italic; margin:0; }
+  .connect-changelog ul{ margin:6px 0 0; padding-left:18px; font-size:.8rem; color:var(--text); line-height:1.7; }
 </style>
 </head>
 <body data-theme="light">
@@ -414,6 +444,10 @@
   <div class="help-row">
     <button class="help-btn" id="helpBtn" type="button">Need Help? 🐰</button>
     <button class="help-btn" id="settingsBtn" type="button">⚙️ Settings</button>
+  </div>
+
+  <div class="footer-row">
+    <button class="help-btn" id="connectBtn" type="button">🍓 Connect Corners</button>
   </div>
 
   <!-- WELCOME CHECK-IN -->
@@ -618,6 +652,49 @@
       <div class="bg-option" data-bg="piggy"><div class="bg-swatch" style="background-image:url('/bg-piggy.png')"></div><span>Dwaekki</span></div>
     </div>
 
+    <h3>🔔 Reminders</h3>
+    <div class="reminder-hint">Tiny nudges, completely optional.</div>
+
+    <div class="reminder-row">
+      <div class="reminder-info">
+        <div class="reminder-title">🩷 Period reminder</div>
+        <div class="reminder-desc">Get a gentle reminder around your estimated period.</div>
+      </div>
+      <button class="toggle-switch" id="reminderPeriodToggle" type="button">OFF</button>
+    </div>
+    <div class="reminder-sub" id="reminderPeriodSub" style="display:none;">
+      Remind me:
+      <select id="reminderPeriodDays">
+        <option value="1">1 day before</option>
+        <option value="2">2 days before</option>
+        <option value="3">3 days before</option>
+      </select>
+    </div>
+
+    <div class="reminder-row">
+      <div class="reminder-info">
+        <div class="reminder-title">💧 Self-care reminder</div>
+        <div class="reminder-desc">A little nudge to pause, hydrate, rest, or take care of yourself.</div>
+      </div>
+      <button class="toggle-switch" id="reminderSelfcareToggle" type="button">OFF</button>
+    </div>
+    <div class="reminder-sub" id="reminderSelfcareSub" style="display:none;">
+      🕐 <input type="time" id="reminderSelfcareTime">
+    </div>
+
+    <div class="reminder-row">
+      <div class="reminder-info">
+        <div class="reminder-title">📝 Daily check-in</div>
+        <div class="reminder-desc">A tiny reminder to log how you're feeling today.</div>
+      </div>
+      <button class="toggle-switch" id="reminderCheckinToggle" type="button">OFF</button>
+    </div>
+    <div class="reminder-sub" id="reminderCheckinSub" style="display:none;">
+      🕐 <input type="time" id="reminderCheckinTime">
+    </div>
+
+    <div class="reminder-note">🔕 You control them. Binnie Clinic never sends reminders unless you turn them on.</div>
+
     <div class="modal-note" id="aboutNote">Binnie Clinic <span id="versionTag"></span> 🐷</div>
 
     <h3>Privacy</h3>
@@ -628,6 +705,46 @@
     <button class="modal-close danger" id="openClearData" type="button">⚠️ Clear My Data</button>
 
     <button class="modal-close" id="closeSettings" type="button">Done 🐰</button>
+  </div>
+</div>
+
+<!-- CONNECT CORNERS MODAL -->
+<div class="modal-overlay" id="connectOverlay">
+  <div class="modal">
+    <h2>🍓 Connect Corners</h2>
+    <div class="modal-sub">A tiny corner of Binnie Clinic for STAYs. 🐰💗</div>
+
+    <div class="connect-card">
+      <div class="connect-card-title">🌷 About the Creator</div>
+      <p class="connect-text">hiii!! I'm Tulika (aka Tuli 🌸)<br>I made Binnie Clinic as a little fan-made project for STAYs. 🐰💗</p>
+      <div class="connect-links">
+        <a href="https://youtube.com/@minberrydiary?si=9-ykiPeArmCa72M3" target="_blank" rel="noopener">📺 YouTube — @minberrydiary</a>
+        <a href="https://www.instagram.com/changbins_big.bakery" target="_blank" rel="noopener">📸 Instagram — @changbins_big.bakery</a>
+        <a href="https://www.instagram.com/.minberry" target="_blank" rel="noopener">📸 Instagram (personal) — @.minberry</a>
+      </div>
+      <p class="connect-signoff">Made with a little creativity, a lot of STAY love, and one very determined Tulika. 🐷💗</p>
+    </div>
+
+    <div class="connect-card">
+      <div class="connect-card-title">🐰 Binnie Corner</div>
+      <p class="connect-text"><b>Binnie Clinic <span id="connectVersionTag"></span></b></p>
+      <div class="connect-changelog">
+        <b>✨ What's new</b>
+        <ul>
+          <li>🔔 Smart Reminders — optional period, self-care &amp; daily check-in reminders</li>
+          <li>🐰 Dwaekki Reactions — Dwaekki now reacts to your visits, entries, time of day &amp; settings</li>
+          <li>🍓 Connect Corners — meet the creator and learn more about Binnie Clinic</li>
+          <li>🛠️ Little fixes &amp; polish</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="connect-card">
+      <div class="connect-card-title">💗 STAY Corner</div>
+      <p class="connect-text" style="margin-bottom:0;">Made for STAYs, wherever you are. 🌎💗</p>
+    </div>
+
+    <button class="modal-close" id="closeConnect" type="button">Done 🐰</button>
   </div>
 </div>
 
@@ -704,6 +821,13 @@
   function setName(name){
     try{ localStorage.setItem(NAME_KEY, name.trim()); }catch(e){}
   }
+
+  // ---------------- visit tracking (for Dwaekki's "long time no see" + first-visit lines) ----------------
+  const LAST_VISIT_KEY = 'binnieClinicLastVisit';
+  const isFirstEverVisit = !localStorage.getItem(NAME_KEY + 'Seen');
+  const lastVisitStr = localStorage.getItem(LAST_VISIT_KEY);
+  const daysSinceLastVisit = lastVisitStr ? Math.floor((Date.now() - new Date(lastVisitStr).getTime()) / 86400000) : null;
+  try{ localStorage.setItem(LAST_VISIT_KEY, new Date().toISOString()); }catch(e){}
 
   const binnieTips = [
     "Heating pad on low + oversized hoodie = instant STAY-approved comfort. No notes.",
@@ -786,8 +910,15 @@
     const el = document.getElementById('dwaekkiText');
     if(!el) return;
     const isDark = document.body.dataset.theme === 'dark';
-    if(isDark){
+    const hour = new Date().getHours();
+    if(isFirstEverVisit){
+      el.textContent = "STAY!! Welcome to Binnie Clinic! 🐷💗";
+    } else if(isDark){
       el.textContent = "It's late... go rest, STAY. 😴";
+    } else if(daysSinceLastVisit !== null && daysSinceLastVisit >= 3){
+      el.textContent = "STAY! Long time no see 👀💗";
+    } else if(hour >= 5 && hour < 11){
+      el.textContent = "Good morning, STAY! ☀️🐰 Ready for today?";
     } else if(!entries.length){
       el.textContent = "No clinic diary entry yet... 👀";
     } else {
@@ -827,6 +958,144 @@
     }
   }catch(e){}
 
+  // ---------------- Smart Reminders ----------------
+  const REMINDER_KEY = 'binnieClinicReminders';
+  const LAST_FIRED_KEY = 'binnieClinicReminderLastFired';
+  const defaultReminders = { period:{on:false, daysBefore:'1'}, selfcare:{on:false, time:'14:00'}, checkin:{on:false, time:'20:00'} };
+  function loadReminders(){
+    try{
+      const raw = JSON.parse(localStorage.getItem(REMINDER_KEY));
+      return raw ? { ...defaultReminders, ...raw } : JSON.parse(JSON.stringify(defaultReminders));
+    }catch(e){ return JSON.parse(JSON.stringify(defaultReminders)); }
+  }
+  function saveReminders(){ try{ localStorage.setItem(REMINDER_KEY, JSON.stringify(reminders)); }catch(e){} }
+  let reminders = loadReminders();
+
+  function notificationsSupported(){ return 'Notification' in window; }
+
+  async function ensureNotificationPermission(){
+    if(!notificationsSupported()) return false;
+    if(Notification.permission === 'granted') return true;
+    if(Notification.permission === 'denied') return false;
+    try{ return (await Notification.requestPermission()) === 'granted'; }
+    catch(e){ return false; }
+  }
+
+  function fireReminderNotification(title, body){
+    if(!notificationsSupported() || Notification.permission !== 'granted') return;
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.getRegistration().then(reg=>{
+        if(reg && reg.showNotification) reg.showNotification(title, { body, icon:'/icon-192.png' });
+        else new Notification(title, { body, icon:'/icon-192.png' });
+      }).catch(()=>{ try{ new Notification(title, { body, icon:'/icon-192.png' }); }catch(e){} });
+    } else {
+      try{ new Notification(title, { body, icon:'/icon-192.png' }); }catch(e){}
+    }
+  }
+
+  // recalculates from live entries every time — never trusts a stale stored date
+  function estimatedNextPeriodDate(){
+    const dated = entries.filter(e=>e.startDate).sort((a,b)=> new Date(b.startDate) - new Date(a.startDate));
+    if(!dated.length) return null;
+    const latest = dated[0];
+    const cLen = parseInt(latest.cycleLength) || 28;
+    const nextDate = new Date(latest.startDate + 'T00:00:00');
+    nextDate.setDate(nextDate.getDate() + cLen);
+    return nextDate;
+  }
+
+  function loadLastFired(){
+    try{ return JSON.parse(localStorage.getItem(LAST_FIRED_KEY) || '{}'); }catch(e){ return {}; }
+  }
+  function saveLastFired(obj){ try{ localStorage.setItem(LAST_FIRED_KEY, JSON.stringify(obj)); }catch(e){} }
+
+  function checkReminders(){
+    if(!notificationsSupported() || Notification.permission !== 'granted') return;
+    const now = new Date();
+    const today = todayStr();
+    const lastFired = loadLastFired();
+
+    if(reminders.period.on){
+      const next = estimatedNextPeriodDate();
+      if(next){
+        const daysBefore = parseInt(reminders.period.daysBefore) || 1;
+        const remindDate = new Date(next);
+        remindDate.setDate(remindDate.getDate() - daysBefore);
+        const key = 'period-' + remindDate.toISOString().slice(0,10);
+        if(remindDate.toDateString() === now.toDateString() && lastFired[key] !== today){
+          fireReminderNotification('🩷 Period reminder', `Your period is estimated around ${next.toLocaleDateString('en-US',{month:'short',day:'numeric'})}. This is an estimate, not a guarantee 💗`);
+          lastFired[key] = today; saveLastFired(lastFired);
+        }
+      }
+    }
+    if(reminders.selfcare.on && reminders.selfcare.time){
+      const [h,m] = reminders.selfcare.time.split(':').map(Number);
+      const key = 'selfcare-' + today;
+      if(now.getHours() === h && now.getMinutes() >= m && now.getMinutes() < m + 2 && lastFired[key] !== today){
+        fireReminderNotification('💧 Self-care reminder', 'A little nudge to pause, hydrate, rest, or take care of yourself. 💗');
+        lastFired[key] = today; saveLastFired(lastFired);
+      }
+    }
+    if(reminders.checkin.on && reminders.checkin.time){
+      const [h,m] = reminders.checkin.time.split(':').map(Number);
+      const key = 'checkin-' + today;
+      if(now.getHours() === h && now.getMinutes() >= m && now.getMinutes() < m + 2 && lastFired[key] !== today){
+        fireReminderNotification('📝 Daily check-in', "A tiny reminder to log how you're feeling today. 🐰");
+        lastFired[key] = today; saveLastFired(lastFired);
+      }
+    }
+  }
+  setInterval(checkReminders, 60000);
+  checkReminders();
+
+  function initReminderUI(){
+    const map = [
+      ['period', 'reminderPeriodToggle', 'reminderPeriodSub'],
+      ['selfcare', 'reminderSelfcareToggle', 'reminderSelfcareSub'],
+      ['checkin', 'reminderCheckinToggle', 'reminderCheckinSub']
+    ];
+    map.forEach(([key, toggleId, subId])=>{
+      const on = !!reminders[key].on;
+      const toggle = document.getElementById(toggleId);
+      toggle.textContent = on ? 'ON' : 'OFF';
+      toggle.classList.toggle('on', on);
+      document.getElementById(subId).style.display = on ? 'flex' : 'none';
+    });
+    document.getElementById('reminderPeriodDays').value = reminders.period.daysBefore || '1';
+    document.getElementById('reminderSelfcareTime').value = reminders.selfcare.time || '14:00';
+    document.getElementById('reminderCheckinTime').value = reminders.checkin.time || '20:00';
+  }
+  initReminderUI();
+
+  async function handleReminderToggle(key){
+    const turningOn = !reminders[key].on;
+    if(turningOn){
+      const granted = await ensureNotificationPermission();
+      if(!granted){
+        showToast(notificationsSupported()
+          ? "🐰 Notifications aren't available here. You can still use Binnie Clinic normally! 💗"
+          : "🐰 Notifications aren't supported on this browser/device. You can still use Binnie Clinic normally! 💗");
+        dwaekkiSay("No worries! I'll stay quiet. 🤐🐰", 4000);
+        return;
+      }
+      reminders[key].on = true;
+      dwaekkiSay("I'll gently remind you when it's time. 🔔💗", 4000);
+    } else {
+      reminders[key].on = false;
+      dwaekkiSay("No worries! I'll stay quiet. 🤐🐰", 4000);
+    }
+    saveReminders();
+    initReminderUI();
+    checkReminders();
+  }
+  document.getElementById('reminderPeriodToggle').addEventListener('click', ()=> handleReminderToggle('period'));
+  document.getElementById('reminderSelfcareToggle').addEventListener('click', ()=> handleReminderToggle('selfcare'));
+  document.getElementById('reminderCheckinToggle').addEventListener('click', ()=> handleReminderToggle('checkin'));
+
+  document.getElementById('reminderPeriodDays').addEventListener('change', e=>{ reminders.period.daysBefore = e.target.value; saveReminders(); });
+  document.getElementById('reminderSelfcareTime').addEventListener('change', e=>{ reminders.selfcare.time = e.target.value; saveReminders(); });
+  document.getElementById('reminderCheckinTime').addEventListener('change', e=>{ reminders.checkin.time = e.target.value; saveReminders(); });
+
   // help modal
   const helpOverlay = document.getElementById('helpOverlay');
   document.getElementById('helpBtn').addEventListener('click', ()=> helpOverlay.classList.add('show'));
@@ -834,8 +1103,15 @@
   helpOverlay.addEventListener('click', (e)=>{ if(e.target === helpOverlay) helpOverlay.classList.remove('show'); });
 
   // ---------------- app version ----------------
-  const APP_VERSION = 'v1.7.0';
+  const APP_VERSION = 'v1.8.0';
   document.getElementById('versionTag').textContent = APP_VERSION;
+  document.getElementById('connectVersionTag').textContent = APP_VERSION;
+
+  // ---------------- connect corners modal ----------------
+  const connectOverlay = document.getElementById('connectOverlay');
+  document.getElementById('connectBtn').addEventListener('click', ()=> connectOverlay.classList.add('show'));
+  document.getElementById('closeConnect').addEventListener('click', ()=> connectOverlay.classList.remove('show'));
+  connectOverlay.addEventListener('click', (e)=>{ if(e.target === connectOverlay) connectOverlay.classList.remove('show'); });
 
   // ---------------- user's name: greeting + first-visit prompt ----------------
   function applyGreeting(){
@@ -879,7 +1155,7 @@
     }
   });
   document.getElementById('confirmClearData').addEventListener('click', ()=>{
-    const keysToClear = [STORAGE_KEY, NAME_KEY, NAME_KEY + 'Seen', THEME_KEY, CHECKIN_KEY, BG_KEY];
+    const keysToClear = [STORAGE_KEY, NAME_KEY, NAME_KEY + 'Seen', THEME_KEY, CHECKIN_KEY, BG_KEY, REMINDER_KEY, LAST_FIRED_KEY, LAST_VISIT_KEY];
     keysToClear.forEach(k=>{ try{ localStorage.removeItem(k); }catch(e){} });
     showToast('Data cleared 🧹');
     setTimeout(()=> window.location.reload(), 700);
