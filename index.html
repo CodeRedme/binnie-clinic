@@ -938,9 +938,10 @@
       <div class="connect-card-title">🐰 Binnie Corner</div>
       <p class="connect-text"><b>Binnie Clinic <span id="connectVersionTag"></span></b></p>
       <div class="connect-changelog">
-        <b>✨ What's new — v1.9.0</b>
+        <b>✨ What's new — v1.9.1</b>
         <ul>
           <li>🪪 STAY ID Card — make a fictional Binnie Clinic ID with your name, photo &amp; bias, front + back, save or share it</li>
+          <li>🛠️ Fixed a bug where saving/sharing the STAY ID card could cut off or distort the card image</li>
           <li>📲 Install Binnie Clinic — a proper install button (with iPhone instructions too)</li>
           <li>🔔 Smart Reminders — optional period, self-care &amp; daily check-in reminders</li>
           <li>🐰 Dwaekki Reactions — Dwaekki now reacts to your visits, entries, time of day &amp; settings</li>
@@ -1009,7 +1010,7 @@
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js" defer></script>
 <script>
   // ---------------- background emoji pattern (chick / strawberry / cheese) ----------------
   const emojiSet = ['🐤','🐥','🍓','🧀','🍡'];
@@ -1330,7 +1331,7 @@
   helpOverlay.addEventListener('click', (e)=>{ if(e.target === helpOverlay) helpOverlay.classList.remove('show'); });
 
   // ---------------- app version ----------------
-  const APP_VERSION = 'v1.9.0';
+  const APP_VERSION = 'v1.9.1';
   document.getElementById('versionTag').textContent = APP_VERSION;
   document.getElementById('connectVersionTag').textContent = APP_VERSION;
 
@@ -1960,30 +1961,40 @@
       showToast('Reset ✨');
     });
 
-    function renderCombinedCanvas(){
-      return Promise.all([
-        html2canvas(frontEl, { scale: 3, backgroundColor: null, onclone: (doc)=>{
-          const clonedFront = doc.getElementById('stayIdFront');
-          if(clonedFront) clonedFront.style.display = 'flex';
-        }}),
-        html2canvas(backEl, { scale: 3, backgroundColor: null, onclone: (doc)=>{
-          const clonedBack = doc.getElementById('stayIdBack');
-          if(clonedBack) clonedBack.style.display = 'flex';
-        }})
-      ]).then(([frontCanvas, backCanvas])=>{
-        const gap = 30 * 3;
-        const w = Math.max(frontCanvas.width, backCanvas.width);
-        const h = frontCanvas.height + backCanvas.height + gap;
-        const combined = document.createElement('canvas');
-        combined.width = w;
-        combined.height = h;
-        const ctx = combined.getContext('2d');
-        ctx.fillStyle = '#FFF7EF';
-        ctx.fillRect(0, 0, w, h);
-        ctx.drawImage(frontCanvas, (w - frontCanvas.width) / 2, 0);
-        ctx.drawImage(backCanvas, (w - backCanvas.width) / 2, frontCanvas.height + gap);
-        return combined;
-      });
+    // capture one face at its exact on-screen size, so nothing can silently
+    // reflow or expand past the card's visible edge in the exported image
+    async function captureFace(el){
+      const prevDisplay = el.style.display;
+      const prevWidth = el.style.width;
+      const prevHeight = el.style.height;
+      el.style.display = 'flex';
+      const rect = el.getBoundingClientRect();
+      el.style.width = rect.width + 'px';
+      el.style.height = rect.height + 'px';
+      try{
+        return await htmlToImage.toCanvas(el, { pixelRatio: 3, backgroundColor: null, cacheBust: true });
+      } finally {
+        el.style.display = prevDisplay;
+        el.style.width = prevWidth;
+        el.style.height = prevHeight;
+      }
+    }
+
+    async function renderCombinedCanvas(){
+      const frontCanvas = await captureFace(frontEl);
+      const backCanvas = await captureFace(backEl);
+      const gap = 30 * 3;
+      const w = Math.max(frontCanvas.width, backCanvas.width);
+      const h = frontCanvas.height + backCanvas.height + gap;
+      const combined = document.createElement('canvas');
+      combined.width = w;
+      combined.height = h;
+      const ctx = combined.getContext('2d');
+      ctx.fillStyle = '#FFF7EF';
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(frontCanvas, (w - frontCanvas.width) / 2, 0);
+      ctx.drawImage(backCanvas, (w - backCanvas.width) / 2, frontCanvas.height + gap);
+      return combined;
     }
 
     function downloadCanvas(canvas, filename){
@@ -1994,11 +2005,10 @@
     }
 
     document.getElementById('stayIdSaveBtn').addEventListener('click', async ()=>{
-      if(typeof html2canvas === 'undefined'){
+      if(typeof htmlToImage === 'undefined'){
         showToast("🐰 Still loading — give it a sec and try again!");
         return;
       }
-      const wasShowingFront = showingFront;
       try{
         const combined = await renderCombinedCanvas();
         downloadCanvas(combined, 'binnie-clinic-stay-id.png');
@@ -2006,27 +2016,19 @@
       }catch(e){
         showToast("🐰 Couldn't save that — try again?");
       }
-      showingFront = wasShowingFront;
-      frontEl.style.display = showingFront ? 'flex' : 'none';
-      backEl.style.display = showingFront ? 'none' : 'flex';
     });
 
     document.getElementById('stayIdShareBtn').addEventListener('click', async ()=>{
-      if(typeof html2canvas === 'undefined'){
+      if(typeof htmlToImage === 'undefined'){
         showToast("🐰 Still loading — give it a sec and try again!");
         return;
       }
-      const wasShowingFront = showingFront;
       let combined;
       try{
         combined = await renderCombinedCanvas();
       }catch(e){
         showToast("🐰 Couldn't put that together — try again?");
         return;
-      } finally {
-        showingFront = wasShowingFront;
-        frontEl.style.display = showingFront ? 'flex' : 'none';
-        backEl.style.display = showingFront ? 'none' : 'flex';
       }
 
       combined.toBlob(async (blob)=>{

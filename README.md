@@ -51,7 +51,7 @@ Visit [binnie-clinic.vercel.app](https://binnie-clinic.vercel.app/) on your phon
 
 Every deploy bumps the cache version in `sw.js` (`CACHE_NAME`) and the version tag in `index.html` (`APP_VERSION`). When you have an older cached version open and a new one ships, you'll see an "Update now" banner — tap it to refresh to the latest version.
 
-Current version: **v1.9.0**
+Current version: **v1.9.1**
 
 ### v1.9.0 — The STAY ID & Install Update
 - 🪪 STAY ID Card — a fictional Binnie Clinic ID with name, photo & bias, front + back design, save as a printable PNG or share via the native share sheet
