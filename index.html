@@ -462,6 +462,7 @@
   .stayid-left{ width:38%; padding:3%; display:flex; flex-direction:column; gap:4%; position:relative; z-index:1; }
   .stayid-logo{ display:flex; align-items:center; gap:4px; font-family:'Baloo 2',sans-serif; font-weight:800; color:#E8447F; line-height:1.1;
     font-size:8px; font-size:2.6cqw; }
+  .stayid-bunny{ width:22px; width:7cqw; flex:none; aspect-ratio:1; }
   .stayid-photo{
     flex:1; background:#D9D9D9; border:2px solid #FF6FA0; border-radius:8px;
     display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; min-height:60px;
@@ -474,13 +475,14 @@
     text-align:center; padding:4% 0; border-radius:4px; font-size:7px; font-size:2.3cqw;
   }
   .stayid-barcode{
-    height:5.5%; background:repeating-linear-gradient(90deg, #222 0 2px, transparent 2px 4px, #222 4px 5px, transparent 5px 8px);
+    height:6%; background:repeating-linear-gradient(90deg, #1a1a1a 0 1px, transparent 1px 2px, #1a1a1a 2px 3px, transparent 3px 3.6px, #1a1a1a 3.6px 5px, transparent 5px 5.6px);
   }
   .stayid-divider{ width:2px; background:repeating-linear-gradient(180deg, #FF9FC4 0 6px, transparent 6px 12px); }
   .stayid-right{ flex:1; padding:3% 3.5%; position:relative; z-index:1; }
+  .stayid-heading-row{ display:flex; align-items:center; gap:2%; }
   .stayid-heading{ font-family:'Baloo 2',sans-serif; font-weight:800; color:#E8447F; line-height:1;
     font-size:20px; font-size:6.2cqw; }
-  .stayid-star{ font-size:.75em; }
+  .stayid-startrail{ width:44px; width:14cqw; flex:none; }
   .stayid-subheading{ font-weight:700; color:#E8447F; letter-spacing:.5px; border-bottom:1.5px solid #FFC7DD;
     padding-bottom:1.5%; margin-bottom:3%; font-size:6.5px; font-size:2.1cqw; }
   .stayid-field-label{ font-weight:700; color:#E8447F; margin-top:2.5%; font-size:6.5px; font-size:2.1cqw; }
@@ -495,11 +497,13 @@
     border:1.5px solid #E8447F; color:#E8447F; border-radius:4px; padding:2% 3%; text-align:center;
     transform:rotate(-8deg); line-height:1.15; font-size:5.5px; font-size:1.7cqw;
   }
+  .stayid-holo-wrap{ position:relative; width:26px; width:9cqw; aspect-ratio:1; flex:none; }
   .stayid-holo{
-    width:9%; aspect-ratio:1; border-radius:4px; flex:none;
+    position:absolute; inset:0; border-radius:4px;
     background:conic-gradient(from 90deg, #ff9fc4, #ffe29f, #9fffe2, #9fc4ff, #ff9fc4);
     transform:rotate(12deg);
   }
+  .stayid-holo-star{ position:absolute; inset:12%; }
   .stayid-idcode{ font-family:'Courier New',monospace; color:#55505C; margin-top:2%; letter-spacing:.5px;
     font-size:7px; font-size:2.3cqw; }
 
@@ -728,7 +732,17 @@
           <div class="stayid-corner tl"></div>
           <div class="stayid-corner tr"></div>
           <div class="stayid-left">
-            <div class="stayid-logo">🐰 <span>BINNIE<br>CLINIC</span></div>
+            <div class="stayid-logo">
+              <svg class="stayid-bunny" viewBox="0 0 40 40" aria-hidden="true">
+                <ellipse cx="14" cy="10" rx="4" ry="10" fill="#fff" stroke="#E8447F" stroke-width="2"/>
+                <ellipse cx="26" cy="10" rx="4" ry="10" fill="#fff" stroke="#E8447F" stroke-width="2"/>
+                <circle cx="20" cy="26" r="12" fill="#fff" stroke="#E8447F" stroke-width="2"/>
+                <circle cx="16" cy="24" r="1.6" fill="#4A2233"/>
+                <circle cx="24" cy="24" r="1.6" fill="#4A2233"/>
+                <path d="M17 29 Q20 32 23 29" stroke="#4A2233" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+              </svg>
+              <span>BINNIE<br>CLINIC</span>
+            </div>
             <div class="stayid-photo" id="stayIdPhotoBox">
               <span class="stayid-photo-placeholder">📷<br>YOUR PHOTO<br>HERE</span>
             </div>
@@ -737,7 +751,16 @@
           </div>
           <div class="stayid-divider"></div>
           <div class="stayid-right">
-            <div class="stayid-heading">STAY ID <span class="stayid-star">✦</span></div>
+            <div class="stayid-heading-row">
+              <div class="stayid-heading">STAY ID</div>
+              <svg class="stayid-startrail" viewBox="0 0 60 30" aria-hidden="true">
+                <polygon points="10,2 12,9 19,9 13,13 15,20 10,16 5,20 7,13 1,9 8,9" fill="#E8447F"/>
+                <circle cx="30" cy="14" r="1.6" fill="#E8447F"/>
+                <circle cx="38" cy="10" r="1.2" fill="#E8447F"/>
+                <circle cx="45" cy="7" r="1" fill="#E8447F"/>
+                <polygon points="52,2 53,5 56,5 53.5,7 54.5,10 52,8 49.5,10 50.5,7 48,5 51,5" fill="#E8447F"/>
+              </svg>
+            </div>
             <div class="stayid-subheading">BINNIE CLINIC • STAY IDENTIFICATION</div>
             <div class="stayid-field-label">NAME</div>
             <div class="stayid-field-box" id="stayIdCardName">YOUR NAME</div>
@@ -751,7 +774,12 @@
                 <div class="stayid-static" id="stayIdCardDate">DD/MM/YYYY</div>
               </div>
               <div class="stayid-stamp">BINNIE<br>CLINIC<br>STAY DIVISION</div>
-              <div class="stayid-holo"></div>
+              <div class="stayid-holo-wrap">
+                <div class="stayid-holo"></div>
+                <svg class="stayid-holo-star" viewBox="0 0 40 40" aria-hidden="true">
+                  <polygon points="20,3 24,15 37,15 26,23 30,35 20,27 10,35 14,23 3,15 16,15" fill="none" stroke="#2C2C2A" stroke-width="1.5"/>
+                </svg>
+              </div>
             </div>
             <div class="stayid-idcode" id="stayIdCardCode">BC-STAY-XXXX</div>
           </div>
@@ -769,7 +797,7 @@
     </div>
 
     <div class="btn-row">
-      <button type="button" id="stayIdSaveBtn">🖨️ Save STAY ID (Front+Back)</button>
+      <button type="button" id="stayIdSaveBtn">🖨️ Save STAY ID</button>
       <button type="button" class="secondary" id="stayIdShareBtn">📤 Share</button>
       <button type="button" class="ghost" id="stayIdResetBtn">Reset</button>
     </div>
@@ -938,9 +966,10 @@
       <div class="connect-card-title">🐰 Binnie Corner</div>
       <p class="connect-text"><b>Binnie Clinic <span id="connectVersionTag"></span></b></p>
       <div class="connect-changelog">
-        <b>✨ What's new — v1.9.1</b>
+        <b>✨ What's new — v1.9.2</b>
         <ul>
           <li>🪪 STAY ID Card — make a fictional Binnie Clinic ID with your name, photo &amp; bias, front + back, save or share it</li>
+          <li>🐰 Closer-to-mockup card design — bunny badge, shooting-star flourish, holographic star sticker</li>
           <li>🛠️ Fixed a bug where saving/sharing the STAY ID card could cut off or distort the card image</li>
           <li>📲 Install Binnie Clinic — a proper install button (with iPhone instructions too)</li>
           <li>🔔 Smart Reminders — optional period, self-care &amp; daily check-in reminders</li>
@@ -1331,7 +1360,7 @@
   helpOverlay.addEventListener('click', (e)=>{ if(e.target === helpOverlay) helpOverlay.classList.remove('show'); });
 
   // ---------------- app version ----------------
-  const APP_VERSION = 'v1.9.1';
+  const APP_VERSION = 'v1.9.3';
   document.getElementById('versionTag').textContent = APP_VERSION;
   document.getElementById('connectVersionTag').textContent = APP_VERSION;
 
@@ -1961,9 +1990,50 @@
       showToast('Reset ✨');
     });
 
+    // the on-screen card uses CSS container-query units (cqw) so it scales
+    // nicely at any width. But html-to-image clones the card in isolation to
+    // rasterize it, and that clone doesn't reliably carry the container
+    // context with it — which is why the exported PNG was coming out with
+    // wildly oversized/misplaced text. Fix: right before capture, compute
+    // exactly what each cqw value resolves to at the card's *actual current*
+    // pixel width, and bake that in as a plain inline px value (no cqw left
+    // for the export step to misinterpret). Restored right after.
+    const STAYID_CQW_MAP = [
+      ['.stayid-logo', 'fontSize', 2.6],
+      ['.stayid-bunny', 'width', 7],
+      ['.stayid-photo-placeholder', 'fontSize', 2.3],
+      ['.stayid-ribbon', 'fontSize', 2.3],
+      ['.stayid-heading', 'fontSize', 6.2],
+      ['.stayid-startrail', 'width', 14],
+      ['.stayid-subheading', 'fontSize', 2.1],
+      ['.stayid-field-label', 'fontSize', 2.1],
+      ['.stayid-field-box', 'fontSize', 2.9],
+      ['.stayid-static', 'fontSize', 2.9],
+      ['.stayid-stamp', 'fontSize', 1.7],
+      ['.stayid-holo-wrap', 'width', 9],
+      ['.stayid-idcode', 'fontSize', 2.3],
+      ['.stayid-back-title', 'fontSize', 6.5],
+      ['.stayid-back-print', 'fontSize', 2.1],
+    ];
+    function lockCqwSizing(cardEl){
+      const widthPx = cardEl.getBoundingClientRect().width;
+      const unit = widthPx / 100;
+      const restores = [];
+      STAYID_CQW_MAP.forEach(([sel, prop, val])=>{
+        cardEl.querySelectorAll(sel).forEach(node=>{
+          restores.push([node, prop, node.style[prop]]);
+          node.style[prop] = (val * unit) + 'px';
+        });
+      });
+      return function unlock(){
+        restores.forEach(([node, prop, old])=>{ node.style[prop] = old; });
+      };
+    }
+
     // capture one face at its exact on-screen size, so nothing can silently
     // reflow or expand past the card's visible edge in the exported image
     async function captureFace(el){
+      if(document.fonts && document.fonts.ready){ try{ await document.fonts.ready; }catch(e){} }
       const prevDisplay = el.style.display;
       const prevWidth = el.style.width;
       const prevHeight = el.style.height;
@@ -1971,30 +2041,15 @@
       const rect = el.getBoundingClientRect();
       el.style.width = rect.width + 'px';
       el.style.height = rect.height + 'px';
+      const unlock = lockCqwSizing(el);
       try{
         return await htmlToImage.toCanvas(el, { pixelRatio: 3, backgroundColor: null, cacheBust: true });
       } finally {
+        unlock();
         el.style.display = prevDisplay;
         el.style.width = prevWidth;
         el.style.height = prevHeight;
       }
-    }
-
-    async function renderCombinedCanvas(){
-      const frontCanvas = await captureFace(frontEl);
-      const backCanvas = await captureFace(backEl);
-      const gap = 30 * 3;
-      const w = Math.max(frontCanvas.width, backCanvas.width);
-      const h = frontCanvas.height + backCanvas.height + gap;
-      const combined = document.createElement('canvas');
-      combined.width = w;
-      combined.height = h;
-      const ctx = combined.getContext('2d');
-      ctx.fillStyle = '#FFF7EF';
-      ctx.fillRect(0, 0, w, h);
-      ctx.drawImage(frontCanvas, (w - frontCanvas.width) / 2, 0);
-      ctx.drawImage(backCanvas, (w - backCanvas.width) / 2, frontCanvas.height + gap);
-      return combined;
     }
 
     function downloadCanvas(canvas, filename){
@@ -2004,15 +2059,18 @@
       link.click();
     }
 
+    // Save/Share only export the FRONT of the card. The back (flip side) is
+    // just an on-site flourish you can flip to and look at — it was never
+    // meant to be baked into the downloadable/shareable PNG.
     document.getElementById('stayIdSaveBtn').addEventListener('click', async ()=>{
       if(typeof htmlToImage === 'undefined'){
         showToast("🐰 Still loading — give it a sec and try again!");
         return;
       }
       try{
-        const combined = await renderCombinedCanvas();
-        downloadCanvas(combined, 'binnie-clinic-stay-id.png');
-        showToast('Saved! Front + back, ready to print ✂️🐰');
+        const frontCanvas = await captureFace(frontEl);
+        downloadCanvas(frontCanvas, 'binnie-clinic-stay-id.png');
+        showToast('Saved! Ready to share 🐰💗');
       }catch(e){
         showToast("🐰 Couldn't save that — try again?");
       }
@@ -2023,15 +2081,15 @@
         showToast("🐰 Still loading — give it a sec and try again!");
         return;
       }
-      let combined;
+      let frontCanvas;
       try{
-        combined = await renderCombinedCanvas();
+        frontCanvas = await captureFace(frontEl);
       }catch(e){
         showToast("🐰 Couldn't put that together — try again?");
         return;
       }
 
-      combined.toBlob(async (blob)=>{
+      frontCanvas.toBlob(async (blob)=>{
         if(!blob) return;
         const file = new File([blob], 'binnie-clinic-stay-id.png', { type: 'image/png' });
         if(navigator.canShare && navigator.canShare({ files: [file] })){
@@ -2040,7 +2098,7 @@
             return;
           }catch(e){ /* cancelled — fall through to download */ }
         }
-        downloadCanvas(combined, 'binnie-clinic-stay-id.png');
+        downloadCanvas(frontCanvas, 'binnie-clinic-stay-id.png');
         showToast('Saved! Now upload it to Insta/TikTok/YouTube from your gallery 🐰💗');
       }, 'image/png');
     });
