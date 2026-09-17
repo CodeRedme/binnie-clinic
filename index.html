@@ -26,6 +26,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
 <style>
   :root{
     --pink-bg: #FFF7EF;
@@ -440,10 +441,13 @@
 
   /* ---------- STAY ID generator ---------- */
   .stayid-preview-wrap{ margin-top:20px; }
-  .stayid-flip-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
-  .stayid-face-label{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:.85rem; color:var(--accent-dark); }
-  #stayIdFlipBtn{ flex:none; min-width:auto; padding:7px 14px; font-size:.76rem; }
   .stayid-card-stage{ display:flex; justify-content:center; container-type: inline-size; }
+
+  /* ---------- STAY ID photo crop modal ---------- */
+  .crop-stage{ width:100%; height:300px; background:#1a1216; border-radius:14px; overflow:hidden; margin-top:2px; }
+  .crop-stage img{ display:block; max-width:100%; }
+  .cropper-view-box, .cropper-face{ border-radius:0; }
+  #stayIdCropConfirm, #stayIdCropCancel{ flex:1; }
 
   .stayid-card{
     position:relative; width:100%; max-width:480px; aspect-ratio:1.58/1;
@@ -507,23 +511,6 @@
   .stayid-idcode{ font-family:'Courier New',monospace; color:#55505C; margin-top:2%; letter-spacing:.5px;
     font-size:7px; font-size:2.3cqw; }
 
-  /* --- back --- */
-  .stayid-back{ background:#fff; display:flex; align-items:center; justify-content:center; position:relative; }
-  .stayid-star-shape{
-    position:absolute;
-    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-  }
-  .stayid-star-shape.star1{ width:65%; height:170%; background:#FBC9DD; top:-35%; left:8%; transform:rotate(-8deg); }
-  .stayid-star-shape.star2{ width:42%; height:110%; background:#FF9FC4; top:-5%; left:4%; transform:rotate(6deg); }
-  .stayid-star-shape.star3{ width:26%; height:65%; background:#FFE1EC; bottom:-15%; right:4%; transform:rotate(-14deg); }
-  .stayid-back-title{
-    position:relative; z-index:2; font-family:'Baloo 2', sans-serif; font-weight:800; color:#5a5560;
-    font-size:21px; font-size:6.5cqw;
-  }
-  .stayid-back-print{
-    position:absolute; bottom:6%; z-index:2; color:#8a7f8a; text-align:center; width:100%;
-    font-size:7px; font-size:2.1cqw;
-  }
 </style>
 </head>
 <body data-theme="light">
@@ -562,7 +549,7 @@
   <div class="stayid-teaser">
     <div class="stayid-teaser-badge">🆕 NEW AT BINNIE CLINIC</div>
     <div class="stayid-teaser-title">🪪 The STAY ID System</div>
-    <p class="stayid-teaser-text">Create your very own fictional Binnie Clinic STAY ID card — with your name, photo &amp; bias. Fan-made, not a real ID! 💗</p>
+    <p class="stayid-teaser-text">Create your very own fictional Binnie Clinic STAY ID card — with your name &amp; photo. Fan-made, not a real ID! 💗</p>
     <button type="button" id="stayIdTeaserBtn">Get My STAY ID →</button>
   </div>
 
@@ -695,37 +682,18 @@
   <!-- STAY ID CARD -->
   <div class="card" id="stayIdSection">
     <div class="section-label">🪪 STAY ID Card</div>
-    <p class="hint" style="margin-bottom:14px;">A fun, fictional Binnie Clinic ID — nothing here is uploaded anywhere, it all stays on your device, and refreshing the page clears it. Not a real ID! 💗</p>
 
     <label class="field" style="margin-top:0;">Your Name</label>
     <input type="text" id="stayIdName" maxlength="20" placeholder="ENTER YOUR NAME">
 
     <label class="field">Upload Photo</label>
     <input type="file" id="stayIdPhoto" accept="image/png,image/jpeg,image/webp">
-
-    <label class="field">Bias</label>
-    <select id="stayIdBias">
-      <option value="">SELECT BIAS</option>
-      <option>Bang Chan</option>
-      <option>Lee Know</option>
-      <option>Changbin</option>
-      <option>Hyunjin</option>
-      <option>Han</option>
-      <option>Felix</option>
-      <option>Seungmin</option>
-      <option>I.N</option>
-      <option>OT8</option>
-    </select>
+    <p class="hint">Pick a photo and you'll get to drag &amp; zoom it into place before it goes on your ID 🐰</p>
 
     <label class="field">STAY Since (optional)</label>
     <input type="text" id="stayIdSince" maxlength="4" placeholder="e.g. 2024">
 
     <div class="stayid-preview-wrap">
-      <div class="stayid-flip-row">
-        <span class="stayid-face-label" id="stayIdFaceLabel">Front</span>
-        <button type="button" class="ghost" id="stayIdFlipBtn">🔄 Flip card</button>
-      </div>
-
       <div class="stayid-card-stage">
         <!-- FRONT -->
         <div class="stayid-card stayid-front" id="stayIdFront">
@@ -766,12 +734,12 @@
             <div class="stayid-field-box" id="stayIdCardName">YOUR NAME</div>
             <div class="stayid-field-label">OCCUPANCY</div>
             <div class="stayid-static">STAY</div>
-            <div class="stayid-field-label">BIAS ♥</div>
-            <div class="stayid-field-box" id="stayIdCardBias">YOUR BIAS</div>
+            <div class="stayid-field-label">DATE OF ISSUE</div>
+            <div class="stayid-static" id="stayIdCardDate">DD/MM/YYYY</div>
             <div class="stayid-bottom-row">
               <div>
-                <div class="stayid-field-label">DATE OF ISSUE</div>
-                <div class="stayid-static" id="stayIdCardDate">DD/MM/YYYY</div>
+                <div class="stayid-field-label">STAY SINCE</div>
+                <div class="stayid-static" id="stayIdCardSince">—</div>
               </div>
               <div class="stayid-stamp">BINNIE<br>CLINIC<br>STAY DIVISION</div>
               <div class="stayid-holo-wrap">
@@ -783,15 +751,6 @@
             </div>
             <div class="stayid-idcode" id="stayIdCardCode">BC-STAY-XXXX</div>
           </div>
-        </div>
-
-        <!-- BACK -->
-        <div class="stayid-card stayid-back" id="stayIdBack" style="display:none;">
-          <div class="stayid-star-shape star1"></div>
-          <div class="stayid-star-shape star2"></div>
-          <div class="stayid-star-shape star3"></div>
-          <div class="stayid-back-title">☆ Binnie Clinic ☆</div>
-          <div class="stayid-back-print">Fan-made · Not a real ID · binnie-clinic.vercel.app</div>
         </div>
       </div>
     </div>
@@ -966,9 +925,14 @@
       <div class="connect-card-title">🐰 Binnie Corner</div>
       <p class="connect-text"><b>Binnie Clinic <span id="connectVersionTag"></span></b></p>
       <div class="connect-changelog">
-        <b>✨ What's new — v1.9.2</b>
+        <b>✨ What's new — v1.9.4</b>
         <ul>
-          <li>🪪 STAY ID Card — make a fictional Binnie Clinic ID with your name, photo &amp; bias, front + back, save or share it</li>
+          <li>🖼️ Drag-&amp;-zoom photo cropping when you upload your STAY ID picture, just like a real ID kiosk</li>
+          <li>🪪 Simplified the STAY ID card — removed the Bias field and the flip-to-back side, added a STAY Since field instead</li>
+        </ul>
+        <b>✨ v1.9.2</b>
+        <ul>
+          <li>🪪 STAY ID Card — make a fictional Binnie Clinic ID with your name &amp; photo, save or share it</li>
           <li>🐰 Closer-to-mockup card design — bunny badge, shooting-star flourish, holographic star sticker</li>
           <li>🛠️ Fixed a bug where saving/sharing the STAY ID card could cut off or distort the card image</li>
           <li>📲 Install Binnie Clinic — a proper install button (with iPhone instructions too)</li>
@@ -1039,7 +1003,23 @@
   </div>
 </div>
 
+<!-- STAY ID PHOTO CROP MODAL -->
+<div class="modal-overlay" id="stayIdCropOverlay">
+  <div class="modal">
+    <h2>🖼️ Adjust Your Photo</h2>
+    <div class="modal-sub">Drag to move it around, scroll or pinch to zoom — get it looking just right. 💗</div>
+    <div class="crop-stage">
+      <img id="stayIdCropImg" src="" alt="Photo to crop">
+    </div>
+    <div class="btn-row" style="margin-top:16px;">
+      <button type="button" class="secondary" id="stayIdCropCancel">Cancel</button>
+      <button type="button" id="stayIdCropConfirm">Use This Photo 🐰</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js" defer></script>
 <script>
   // ---------------- background emoji pattern (chick / strawberry / cheese) ----------------
   const emojiSet = ['🐤','🐥','🍓','🧀','🍡'];
@@ -1360,7 +1340,7 @@
   helpOverlay.addEventListener('click', (e)=>{ if(e.target === helpOverlay) helpOverlay.classList.remove('show'); });
 
   // ---------------- app version ----------------
-  const APP_VERSION = 'v1.9.3';
+  const APP_VERSION = 'v1.9.4';
   document.getElementById('versionTag').textContent = APP_VERSION;
   document.getElementById('connectVersionTag').textContent = APP_VERSION;
 
@@ -1922,19 +1902,15 @@
   (function(){
     const nameInput = document.getElementById('stayIdName');
     const photoInput = document.getElementById('stayIdPhoto');
-    const biasSelect = document.getElementById('stayIdBias');
     const sinceInput = document.getElementById('stayIdSince');
 
     const cardName = document.getElementById('stayIdCardName');
-    const cardBias = document.getElementById('stayIdCardBias');
     const cardDate = document.getElementById('stayIdCardDate');
+    const cardSince = document.getElementById('stayIdCardSince');
     const cardCode = document.getElementById('stayIdCardCode');
     const photoBox = document.getElementById('stayIdPhotoBox');
 
     const frontEl = document.getElementById('stayIdFront');
-    const backEl = document.getElementById('stayIdBack');
-    const flipBtn = document.getElementById('stayIdFlipBtn');
-    const faceLabel = document.getElementById('stayIdFaceLabel');
 
     function generateID(){
       return 'BC-STAY-' + Math.floor(1000 + Math.random() * 9000);
@@ -1949,41 +1925,80 @@
     nameInput.addEventListener('input', ()=>{
       cardName.textContent = nameInput.value.trim().toUpperCase() || 'YOUR NAME';
     });
-    biasSelect.addEventListener('change', ()=>{
-      cardBias.textContent = biasSelect.value ? biasSelect.value.toUpperCase() : 'YOUR BIAS';
-    });
     sinceInput.addEventListener('input', ()=>{
-      // folded quietly into the date-of-issue line if provided, otherwise today's date stays
-      if(sinceInput.value.trim()){
-        cardDate.textContent = `${dd}/${mm}/${today.getFullYear()} · STAY since ${sinceInput.value.trim()}`;
-      } else {
-        cardDate.textContent = `${dd}/${mm}/${today.getFullYear()}`;
-      }
+      cardSince.textContent = sinceInput.value.trim() || '—';
     });
+
+    // ---------- photo upload + crop ----------
+    const cropOverlay = document.getElementById('stayIdCropOverlay');
+    const cropImg = document.getElementById('stayIdCropImg');
+    const cropConfirmBtn = document.getElementById('stayIdCropConfirm');
+    const cropCancelBtn = document.getElementById('stayIdCropCancel');
+    let cropper = null;
+
+    function closeCropModal(){
+      cropOverlay.classList.remove('show');
+      if(cropper){ cropper.destroy(); cropper = null; }
+      cropImg.removeAttribute('src');
+    }
 
     photoInput.addEventListener('change', ()=>{
       const file = photoInput.files[0];
       if(!file) return;
       const reader = new FileReader();
       reader.onload = (event)=>{
-        photoBox.innerHTML = `<img src="${event.target.result}" alt="Your photo">`;
+        cropImg.src = event.target.result;
+        cropOverlay.classList.add('show');
+        cropImg.onload = ()=>{
+          if(typeof Cropper === 'undefined'){
+            // cropper library still loading — just use the photo as-is
+            photoBox.innerHTML = `<img src="${event.target.result}" alt="Your photo">`;
+            closeCropModal();
+            return;
+          }
+          if(cropper) cropper.destroy();
+          const boxRect = photoBox.getBoundingClientRect();
+          const aspect = (boxRect.width && boxRect.height) ? (boxRect.width / boxRect.height) : (3/4);
+          cropper = new Cropper(cropImg, {
+            aspectRatio: aspect,
+            viewMode: 1,
+            dragMode: 'move',
+            autoCropArea: 1,
+            background: false,
+            guides: false,
+            highlight: false,
+            center: false,
+            cropBoxMovable: false,
+            cropBoxResizable: false,
+            toggleDragModeOnDblclick: false,
+          });
+        };
       };
       reader.readAsDataURL(file);
     });
 
-    let showingFront = true;
-    flipBtn.addEventListener('click', ()=>{
-      showingFront = !showingFront;
-      frontEl.style.display = showingFront ? 'flex' : 'none';
-      backEl.style.display = showingFront ? 'none' : 'flex';
-      faceLabel.textContent = showingFront ? 'Front' : 'Back';
+    cropConfirmBtn.addEventListener('click', ()=>{
+      if(!cropper) return;
+      const canvas = cropper.getCroppedCanvas({ width: 640, imageSmoothingQuality: 'high' });
+      const dataUrl = canvas.toDataURL('image/png');
+      photoBox.innerHTML = `<img src="${dataUrl}" alt="Your photo">`;
+      closeCropModal();
+    });
+
+    cropCancelBtn.addEventListener('click', ()=>{
+      if(!photoBox.querySelector('img')){ photoInput.value = ''; }
+      closeCropModal();
+    });
+
+    cropOverlay.addEventListener('click', (e)=>{
+      if(e.target === cropOverlay) cropCancelBtn.click();
     });
 
     document.getElementById('stayIdResetBtn').addEventListener('click', ()=>{
-      nameInput.value = ''; sinceInput.value = ''; biasSelect.value = '';
+      nameInput.value = ''; sinceInput.value = '';
       photoInput.value = '';
       cardName.textContent = 'YOUR NAME';
-      cardBias.textContent = 'YOUR BIAS';
+      cardSince.textContent = '—';
       cardDate.textContent = `${dd}/${mm}/${today.getFullYear()}`;
       photoBox.innerHTML = '<span class="stayid-photo-placeholder">📷<br>YOUR PHOTO<br>HERE</span>';
       cardCode.textContent = generateID();
@@ -2012,8 +2027,6 @@
       ['.stayid-stamp', 'fontSize', 1.7],
       ['.stayid-holo-wrap', 'width', 9],
       ['.stayid-idcode', 'fontSize', 2.3],
-      ['.stayid-back-title', 'fontSize', 6.5],
-      ['.stayid-back-print', 'fontSize', 2.1],
     ];
     function lockCqwSizing(cardEl){
       const widthPx = cardEl.getBoundingClientRect().width;
@@ -2059,9 +2072,6 @@
       link.click();
     }
 
-    // Save/Share only export the FRONT of the card. The back (flip side) is
-    // just an on-site flourish you can flip to and look at — it was never
-    // meant to be baked into the downloadable/shareable PNG.
     document.getElementById('stayIdSaveBtn').addEventListener('click', async ()=>{
       if(typeof htmlToImage === 'undefined'){
         showToast("🐰 Still loading — give it a sec and try again!");
