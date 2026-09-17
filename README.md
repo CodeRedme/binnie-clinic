@@ -51,7 +51,11 @@ Visit [binnie-clinic.vercel.app](https://binnie-clinic.vercel.app/) on your phon
 
 Every deploy bumps the cache version in `sw.js` (`CACHE_NAME`) and the version tag in `index.html` (`APP_VERSION`). When you have an older cached version open and a new one ships, you'll see an "Update now" banner — tap it to refresh to the latest version.
 
-Current version: **v1.8.0**
+Current version: **v1.9.0**
+
+### v1.9.0 — The STAY ID & Install Update
+- 🪪 STAY ID Card — a fictional Binnie Clinic ID with name, photo & bias, front + back design, save as a printable PNG or share via the native share sheet
+- 📲 Install Binnie Clinic — install button with a native prompt on Android/desktop and step-by-step Add to Home Screen instructions on iOS
 
 ### v1.8.0 — The Little Reminder Update
 - 🔔 Smart Reminders — optional, opt-in period / self-care / daily check-in notifications

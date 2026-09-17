@@ -415,6 +415,111 @@
   .connect-links a:hover{ text-decoration:underline; }
   .connect-signoff{ font-size:.78rem; color:var(--muted); font-style:italic; margin:0; }
   .connect-changelog ul{ margin:6px 0 0; padding-left:18px; font-size:.8rem; color:var(--text); line-height:1.7; }
+
+  /* ---------- install banner ---------- */
+  .install-card{
+    display:flex; align-items:center; gap:12px; background:var(--soft);
+    border:1.5px solid var(--border); border-radius:18px; padding:14px 16px; margin-bottom:18px;
+  }
+  .install-icon{ font-size:1.6rem; flex:none; }
+  .install-text{ flex:1; }
+  .install-text b{ font-family:'Baloo 2', sans-serif; color:var(--accent-dark); font-size:.9rem; }
+  .install-text p{ font-size:.78rem; color:var(--muted); margin:2px 0 0; }
+  #installActionBtn{ flex:none; min-width:auto; padding:9px 16px; font-size:.8rem; }
+
+  /* ---------- STAY ID teaser ---------- */
+  .stayid-teaser{
+    background:linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    color:#fff; border-radius:20px; padding:18px 20px; margin-bottom:22px; text-align:center;
+  }
+  .stayid-teaser-badge{ font-size:.7rem; font-weight:700; letter-spacing:.5px; opacity:.9; margin-bottom:6px; }
+  .stayid-teaser-title{ font-family:'Baloo 2', sans-serif; font-weight:800; font-size:1.15rem; margin-bottom:6px; }
+  .stayid-teaser-text{ font-size:.82rem; line-height:1.5; opacity:.95; margin:0 0 14px; }
+  .stayid-teaser button{ background:#fff; color:var(--accent-dark); min-width:auto; padding:10px 20px; }
+  .stayid-teaser button:hover{ background:var(--soft); }
+
+  /* ---------- STAY ID generator ---------- */
+  .stayid-preview-wrap{ margin-top:20px; }
+  .stayid-flip-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .stayid-face-label{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:.85rem; color:var(--accent-dark); }
+  #stayIdFlipBtn{ flex:none; min-width:auto; padding:7px 14px; font-size:.76rem; }
+  .stayid-card-stage{ display:flex; justify-content:center; container-type: inline-size; }
+
+  .stayid-card{
+    position:relative; width:100%; max-width:480px; aspect-ratio:1.58/1;
+    border-radius:18px; overflow:hidden; font-family:'Fredoka', sans-serif;
+    box-shadow:0 10px 26px rgba(0,0,0,.15);
+  }
+
+  /* --- front --- */
+  .stayid-front{ background:#FDF2F6; display:flex; border:2px solid #FF9FC4; color:#4A2233; }
+  .stayid-corner{
+    position:absolute; width:15%; aspect-ratio:1; z-index:2;
+    background: repeating-linear-gradient(45deg, #FF6FA0 0 15%, transparent 15% 30%);
+  }
+  .stayid-corner.tl{ top:0; left:0; clip-path:polygon(0 0, 100% 0, 0 100%); }
+  .stayid-corner.tr{ top:0; right:0; clip-path:polygon(0 0, 100% 0, 100% 100%); }
+  .stayid-left{ width:38%; padding:3%; display:flex; flex-direction:column; gap:4%; position:relative; z-index:1; }
+  .stayid-logo{ display:flex; align-items:center; gap:4px; font-family:'Baloo 2',sans-serif; font-weight:800; color:#E8447F; line-height:1.1;
+    font-size:8px; font-size:2.6cqw; }
+  .stayid-photo{
+    flex:1; background:#D9D9D9; border:2px solid #FF6FA0; border-radius:8px;
+    display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; min-height:60px;
+  }
+  .stayid-photo img{ width:100%; height:100%; object-fit:cover; }
+  .stayid-photo-placeholder{ color:#fff; font-weight:700; text-align:center; line-height:1.5;
+    font-size:7px; font-size:2.3cqw; }
+  .stayid-ribbon{
+    background:#FF6FA0; color:#fff; font-family:'Baloo 2',sans-serif; font-weight:700;
+    text-align:center; padding:4% 0; border-radius:4px; font-size:7px; font-size:2.3cqw;
+  }
+  .stayid-barcode{
+    height:5.5%; background:repeating-linear-gradient(90deg, #222 0 2px, transparent 2px 4px, #222 4px 5px, transparent 5px 8px);
+  }
+  .stayid-divider{ width:2px; background:repeating-linear-gradient(180deg, #FF9FC4 0 6px, transparent 6px 12px); }
+  .stayid-right{ flex:1; padding:3% 3.5%; position:relative; z-index:1; }
+  .stayid-heading{ font-family:'Baloo 2',sans-serif; font-weight:800; color:#E8447F; line-height:1;
+    font-size:20px; font-size:6.2cqw; }
+  .stayid-star{ font-size:.75em; }
+  .stayid-subheading{ font-weight:700; color:#E8447F; letter-spacing:.5px; border-bottom:1.5px solid #FFC7DD;
+    padding-bottom:1.5%; margin-bottom:3%; font-size:6.5px; font-size:2.1cqw; }
+  .stayid-field-label{ font-weight:700; color:#E8447F; margin-top:2.5%; font-size:6.5px; font-size:2.1cqw; }
+  .stayid-field-box{
+    border:1.5px solid #FF9FC4; border-radius:4px; padding:1.5% 3%; font-weight:700; color:#55505C;
+    text-transform:uppercase; margin-top:1%; min-height:14px; font-size:9.5px; font-size:2.9cqw;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .stayid-static{ font-weight:700; color:#55505C; text-transform:uppercase; font-size:9.5px; font-size:2.9cqw; }
+  .stayid-bottom-row{ display:flex; align-items:flex-end; justify-content:space-between; margin-top:3%; gap:6px; }
+  .stayid-stamp{
+    border:1.5px solid #E8447F; color:#E8447F; border-radius:4px; padding:2% 3%; text-align:center;
+    transform:rotate(-8deg); line-height:1.15; font-size:5.5px; font-size:1.7cqw;
+  }
+  .stayid-holo{
+    width:9%; aspect-ratio:1; border-radius:4px; flex:none;
+    background:conic-gradient(from 90deg, #ff9fc4, #ffe29f, #9fffe2, #9fc4ff, #ff9fc4);
+    transform:rotate(12deg);
+  }
+  .stayid-idcode{ font-family:'Courier New',monospace; color:#55505C; margin-top:2%; letter-spacing:.5px;
+    font-size:7px; font-size:2.3cqw; }
+
+  /* --- back --- */
+  .stayid-back{ background:#fff; display:flex; align-items:center; justify-content:center; position:relative; }
+  .stayid-star-shape{
+    position:absolute;
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  }
+  .stayid-star-shape.star1{ width:65%; height:170%; background:#FBC9DD; top:-35%; left:8%; transform:rotate(-8deg); }
+  .stayid-star-shape.star2{ width:42%; height:110%; background:#FF9FC4; top:-5%; left:4%; transform:rotate(6deg); }
+  .stayid-star-shape.star3{ width:26%; height:65%; background:#FFE1EC; bottom:-15%; right:4%; transform:rotate(-14deg); }
+  .stayid-back-title{
+    position:relative; z-index:2; font-family:'Baloo 2', sans-serif; font-weight:800; color:#5a5560;
+    font-size:21px; font-size:6.5cqw;
+  }
+  .stayid-back-print{
+    position:absolute; bottom:6%; z-index:2; color:#8a7f8a; text-align:center; width:100%;
+    font-size:7px; font-size:2.1cqw;
+  }
 </style>
 </head>
 <body data-theme="light">
@@ -439,6 +544,22 @@
 
   <div class="night-banner" id="nightBanner">
     <b>🌙 Night Clinic is open.</b> You've done enough for today. Rest is allowed. 🐰💗
+  </div>
+
+  <div class="install-card" id="installCard" style="display:none;">
+    <div class="install-icon">📲</div>
+    <div class="install-text">
+      <b>Install Binnie Clinic</b>
+      <p>Keep your little clinic on your phone 💗</p>
+    </div>
+    <button type="button" class="secondary" id="installActionBtn">Install 🐰</button>
+  </div>
+
+  <div class="stayid-teaser">
+    <div class="stayid-teaser-badge">🆕 NEW AT BINNIE CLINIC</div>
+    <div class="stayid-teaser-title">🪪 The STAY ID System</div>
+    <p class="stayid-teaser-text">Create your very own fictional Binnie Clinic STAY ID card — with your name, photo &amp; bias. Fan-made, not a real ID! 💗</p>
+    <button type="button" id="stayIdTeaserBtn">Get My STAY ID →</button>
   </div>
 
   <div class="help-row">
@@ -565,6 +686,94 @@
     <div class="section-label">📋 My Clinic Diary</div>
     <div class="diary-lock-note">🔒 Stored on this device only — never uploaded anywhere</div>
     <div id="entriesList"></div>
+  </div>
+
+  <!-- STAY ID CARD -->
+  <div class="card" id="stayIdSection">
+    <div class="section-label">🪪 STAY ID Card</div>
+    <p class="hint" style="margin-bottom:14px;">A fun, fictional Binnie Clinic ID — nothing here is uploaded anywhere, it all stays on your device, and refreshing the page clears it. Not a real ID! 💗</p>
+
+    <label class="field" style="margin-top:0;">Your Name</label>
+    <input type="text" id="stayIdName" maxlength="20" placeholder="ENTER YOUR NAME">
+
+    <label class="field">Upload Photo</label>
+    <input type="file" id="stayIdPhoto" accept="image/png,image/jpeg,image/webp">
+
+    <label class="field">Bias</label>
+    <select id="stayIdBias">
+      <option value="">SELECT BIAS</option>
+      <option>Bang Chan</option>
+      <option>Lee Know</option>
+      <option>Changbin</option>
+      <option>Hyunjin</option>
+      <option>Han</option>
+      <option>Felix</option>
+      <option>Seungmin</option>
+      <option>I.N</option>
+      <option>OT8</option>
+    </select>
+
+    <label class="field">STAY Since (optional)</label>
+    <input type="text" id="stayIdSince" maxlength="4" placeholder="e.g. 2024">
+
+    <div class="stayid-preview-wrap">
+      <div class="stayid-flip-row">
+        <span class="stayid-face-label" id="stayIdFaceLabel">Front</span>
+        <button type="button" class="ghost" id="stayIdFlipBtn">🔄 Flip card</button>
+      </div>
+
+      <div class="stayid-card-stage">
+        <!-- FRONT -->
+        <div class="stayid-card stayid-front" id="stayIdFront">
+          <div class="stayid-corner tl"></div>
+          <div class="stayid-corner tr"></div>
+          <div class="stayid-left">
+            <div class="stayid-logo">🐰 <span>BINNIE<br>CLINIC</span></div>
+            <div class="stayid-photo" id="stayIdPhotoBox">
+              <span class="stayid-photo-placeholder">📷<br>YOUR PHOTO<br>HERE</span>
+            </div>
+            <div class="stayid-ribbon">★ BINNIE CLINIC</div>
+            <div class="stayid-barcode"></div>
+          </div>
+          <div class="stayid-divider"></div>
+          <div class="stayid-right">
+            <div class="stayid-heading">STAY ID <span class="stayid-star">✦</span></div>
+            <div class="stayid-subheading">BINNIE CLINIC • STAY IDENTIFICATION</div>
+            <div class="stayid-field-label">NAME</div>
+            <div class="stayid-field-box" id="stayIdCardName">YOUR NAME</div>
+            <div class="stayid-field-label">OCCUPANCY</div>
+            <div class="stayid-static">STAY</div>
+            <div class="stayid-field-label">BIAS ♥</div>
+            <div class="stayid-field-box" id="stayIdCardBias">YOUR BIAS</div>
+            <div class="stayid-bottom-row">
+              <div>
+                <div class="stayid-field-label">DATE OF ISSUE</div>
+                <div class="stayid-static" id="stayIdCardDate">DD/MM/YYYY</div>
+              </div>
+              <div class="stayid-stamp">BINNIE<br>CLINIC<br>STAY DIVISION</div>
+              <div class="stayid-holo"></div>
+            </div>
+            <div class="stayid-idcode" id="stayIdCardCode">BC-STAY-XXXX</div>
+          </div>
+        </div>
+
+        <!-- BACK -->
+        <div class="stayid-card stayid-back" id="stayIdBack" style="display:none;">
+          <div class="stayid-star-shape star1"></div>
+          <div class="stayid-star-shape star2"></div>
+          <div class="stayid-star-shape star3"></div>
+          <div class="stayid-back-title">☆ Binnie Clinic ☆</div>
+          <div class="stayid-back-print">Fan-made · Not a real ID · binnie-clinic.vercel.app</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button type="button" id="stayIdSaveBtn">🖨️ Save STAY ID (Front+Back)</button>
+      <button type="button" class="secondary" id="stayIdShareBtn">📤 Share</button>
+      <button type="button" class="ghost" id="stayIdResetBtn">Reset</button>
+    </div>
+    <p class="hint">Sharing opens your phone's share sheet — pick Instagram, TikTok, or YouTube from there 💗 On desktop it just downloads the image so you can upload it yourself.</p>
   </div>
 
   <!-- SELF CARE -->
@@ -729,12 +938,13 @@
       <div class="connect-card-title">🐰 Binnie Corner</div>
       <p class="connect-text"><b>Binnie Clinic <span id="connectVersionTag"></span></b></p>
       <div class="connect-changelog">
-        <b>✨ What's new</b>
+        <b>✨ What's new — v1.9.0</b>
         <ul>
+          <li>🪪 STAY ID Card — make a fictional Binnie Clinic ID with your name, photo &amp; bias, front + back, save or share it</li>
+          <li>📲 Install Binnie Clinic — a proper install button (with iPhone instructions too)</li>
           <li>🔔 Smart Reminders — optional period, self-care &amp; daily check-in reminders</li>
           <li>🐰 Dwaekki Reactions — Dwaekki now reacts to your visits, entries, time of day &amp; settings</li>
           <li>🍓 Connect Corners — meet the creator and learn more about Binnie Clinic</li>
-          <li>🛠️ Little fixes &amp; polish</li>
         </ul>
       </div>
     </div>
@@ -745,6 +955,22 @@
     </div>
 
     <button class="modal-close" id="closeConnect" type="button">Done 🐰</button>
+  </div>
+</div>
+
+<!-- iOS INSTALL INSTRUCTIONS MODAL -->
+<div class="modal-overlay" id="iosInstallOverlay">
+  <div class="modal">
+    <h2>📲 Install Binnie Clinic</h2>
+    <div class="modal-sub">On iPhone/iPad, installing takes just a few taps in Safari.</div>
+    <ol style="padding-left:20px; font-size:.87rem; line-height:1.9; color:var(--text); margin:0;">
+      <li>Open Binnie Clinic in <b>Safari</b> 🌐</li>
+      <li>Tap the <b>Share</b> icon ⬆️</li>
+      <li>Tap <b>Add to Home Screen</b></li>
+      <li>Tap <b>Add</b> 💗</li>
+    </ol>
+    <div class="modal-note">🐰 That's it! Binnie Clinic will appear on your Home Screen like a real app.</div>
+    <button class="modal-close" id="closeIosInstall" type="button">Got it 🐰</button>
   </div>
 </div>
 
@@ -783,6 +1009,7 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <script>
   // ---------------- background emoji pattern (chick / strawberry / cheese) ----------------
   const emojiSet = ['🐤','🐥','🍓','🧀','🍡'];
@@ -1103,7 +1330,7 @@
   helpOverlay.addEventListener('click', (e)=>{ if(e.target === helpOverlay) helpOverlay.classList.remove('show'); });
 
   // ---------------- app version ----------------
-  const APP_VERSION = 'v1.8.0';
+  const APP_VERSION = 'v1.9.0';
   document.getElementById('versionTag').textContent = APP_VERSION;
   document.getElementById('connectVersionTag').textContent = APP_VERSION;
 
@@ -1618,6 +1845,204 @@
       }).catch(()=>{});
     });
   }
+
+  // ================= INSTALL BINNIE CLINIC =================
+  (function(){
+    const installCard = document.getElementById('installCard');
+    const installBtn = document.getElementById('installActionBtn');
+    const iosOverlay = document.getElementById('iosInstallOverlay');
+    let deferredPrompt = null;
+
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    const ua = window.navigator.userAgent || '';
+    const isIos = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+
+    if(isStandalone){
+      installCard.style.display = 'none';
+    } else if(isIos){
+      installCard.style.display = 'flex';
+      installBtn.addEventListener('click', ()=> iosOverlay.classList.add('show'));
+    } else {
+      // Android/desktop Chromium: wait for the native prompt signal before showing anything
+      window.addEventListener('beforeinstallprompt', (e)=>{
+        e.preventDefault();
+        deferredPrompt = e;
+        installCard.style.display = 'flex';
+      });
+      installBtn.addEventListener('click', async ()=>{
+        if(!deferredPrompt) return;
+        deferredPrompt.prompt();
+        try{ await deferredPrompt.userChoice; }catch(e){}
+        deferredPrompt = null;
+        installCard.style.display = 'none';
+      });
+    }
+
+    window.addEventListener('appinstalled', ()=>{ installCard.style.display = 'none'; });
+
+    document.getElementById('closeIosInstall').addEventListener('click', ()=> iosOverlay.classList.remove('show'));
+    iosOverlay.addEventListener('click', (e)=>{ if(e.target === iosOverlay) iosOverlay.classList.remove('show'); });
+
+    document.getElementById('stayIdTeaserBtn').addEventListener('click', ()=>{
+      document.getElementById('stayIdSection').scrollIntoView({ behavior:'smooth', block:'start' });
+    });
+  })();
+
+  // ================= STAY ID CARD =================
+  (function(){
+    const nameInput = document.getElementById('stayIdName');
+    const photoInput = document.getElementById('stayIdPhoto');
+    const biasSelect = document.getElementById('stayIdBias');
+    const sinceInput = document.getElementById('stayIdSince');
+
+    const cardName = document.getElementById('stayIdCardName');
+    const cardBias = document.getElementById('stayIdCardBias');
+    const cardDate = document.getElementById('stayIdCardDate');
+    const cardCode = document.getElementById('stayIdCardCode');
+    const photoBox = document.getElementById('stayIdPhotoBox');
+
+    const frontEl = document.getElementById('stayIdFront');
+    const backEl = document.getElementById('stayIdBack');
+    const flipBtn = document.getElementById('stayIdFlipBtn');
+    const faceLabel = document.getElementById('stayIdFaceLabel');
+
+    function generateID(){
+      return 'BC-STAY-' + Math.floor(1000 + Math.random() * 9000);
+    }
+    cardCode.textContent = generateID();
+
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    cardDate.textContent = `${dd}/${mm}/${today.getFullYear()}`;
+
+    nameInput.addEventListener('input', ()=>{
+      cardName.textContent = nameInput.value.trim().toUpperCase() || 'YOUR NAME';
+    });
+    biasSelect.addEventListener('change', ()=>{
+      cardBias.textContent = biasSelect.value ? biasSelect.value.toUpperCase() : 'YOUR BIAS';
+    });
+    sinceInput.addEventListener('input', ()=>{
+      // folded quietly into the date-of-issue line if provided, otherwise today's date stays
+      if(sinceInput.value.trim()){
+        cardDate.textContent = `${dd}/${mm}/${today.getFullYear()} · STAY since ${sinceInput.value.trim()}`;
+      } else {
+        cardDate.textContent = `${dd}/${mm}/${today.getFullYear()}`;
+      }
+    });
+
+    photoInput.addEventListener('change', ()=>{
+      const file = photoInput.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = (event)=>{
+        photoBox.innerHTML = `<img src="${event.target.result}" alt="Your photo">`;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    let showingFront = true;
+    flipBtn.addEventListener('click', ()=>{
+      showingFront = !showingFront;
+      frontEl.style.display = showingFront ? 'flex' : 'none';
+      backEl.style.display = showingFront ? 'none' : 'flex';
+      faceLabel.textContent = showingFront ? 'Front' : 'Back';
+    });
+
+    document.getElementById('stayIdResetBtn').addEventListener('click', ()=>{
+      nameInput.value = ''; sinceInput.value = ''; biasSelect.value = '';
+      photoInput.value = '';
+      cardName.textContent = 'YOUR NAME';
+      cardBias.textContent = 'YOUR BIAS';
+      cardDate.textContent = `${dd}/${mm}/${today.getFullYear()}`;
+      photoBox.innerHTML = '<span class="stayid-photo-placeholder">📷<br>YOUR PHOTO<br>HERE</span>';
+      cardCode.textContent = generateID();
+      showToast('Reset ✨');
+    });
+
+    function renderCombinedCanvas(){
+      return Promise.all([
+        html2canvas(frontEl, { scale: 3, backgroundColor: null, onclone: (doc)=>{
+          const clonedFront = doc.getElementById('stayIdFront');
+          if(clonedFront) clonedFront.style.display = 'flex';
+        }}),
+        html2canvas(backEl, { scale: 3, backgroundColor: null, onclone: (doc)=>{
+          const clonedBack = doc.getElementById('stayIdBack');
+          if(clonedBack) clonedBack.style.display = 'flex';
+        }})
+      ]).then(([frontCanvas, backCanvas])=>{
+        const gap = 30 * 3;
+        const w = Math.max(frontCanvas.width, backCanvas.width);
+        const h = frontCanvas.height + backCanvas.height + gap;
+        const combined = document.createElement('canvas');
+        combined.width = w;
+        combined.height = h;
+        const ctx = combined.getContext('2d');
+        ctx.fillStyle = '#FFF7EF';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(frontCanvas, (w - frontCanvas.width) / 2, 0);
+        ctx.drawImage(backCanvas, (w - backCanvas.width) / 2, frontCanvas.height + gap);
+        return combined;
+      });
+    }
+
+    function downloadCanvas(canvas, filename){
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    document.getElementById('stayIdSaveBtn').addEventListener('click', async ()=>{
+      if(typeof html2canvas === 'undefined'){
+        showToast("🐰 Still loading — give it a sec and try again!");
+        return;
+      }
+      const wasShowingFront = showingFront;
+      try{
+        const combined = await renderCombinedCanvas();
+        downloadCanvas(combined, 'binnie-clinic-stay-id.png');
+        showToast('Saved! Front + back, ready to print ✂️🐰');
+      }catch(e){
+        showToast("🐰 Couldn't save that — try again?");
+      }
+      showingFront = wasShowingFront;
+      frontEl.style.display = showingFront ? 'flex' : 'none';
+      backEl.style.display = showingFront ? 'none' : 'flex';
+    });
+
+    document.getElementById('stayIdShareBtn').addEventListener('click', async ()=>{
+      if(typeof html2canvas === 'undefined'){
+        showToast("🐰 Still loading — give it a sec and try again!");
+        return;
+      }
+      const wasShowingFront = showingFront;
+      let combined;
+      try{
+        combined = await renderCombinedCanvas();
+      }catch(e){
+        showToast("🐰 Couldn't put that together — try again?");
+        return;
+      } finally {
+        showingFront = wasShowingFront;
+        frontEl.style.display = showingFront ? 'flex' : 'none';
+        backEl.style.display = showingFront ? 'none' : 'flex';
+      }
+
+      combined.toBlob(async (blob)=>{
+        if(!blob) return;
+        const file = new File([blob], 'binnie-clinic-stay-id.png', { type: 'image/png' });
+        if(navigator.canShare && navigator.canShare({ files: [file] })){
+          try{
+            await navigator.share({ files: [file], title: 'My Binnie Clinic STAY ID', text: 'Made my STAY ID on Binnie Clinic! 🐰💗' });
+            return;
+          }catch(e){ /* cancelled — fall through to download */ }
+        }
+        downloadCanvas(combined, 'binnie-clinic-stay-id.png');
+        showToast('Saved! Now upload it to Insta/TikTok/YouTube from your gallery 🐰💗');
+      }, 'image/png');
+    });
+  })();
 </script>
 </body>
 </html>
