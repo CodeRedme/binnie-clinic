@@ -1,0 +1,2162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Binnie Clinic 🐰 | Cute STAY-Coded Period Tracker</title>
+<meta name="description" content="Binnie Clinic is a cute, STAY-coded period & cycle diary made for Stray Kids fans — log entries, track moods and symptoms, get gentle self-care tips, and see your next period estimate.">
+<link rel="canonical" href="https://binnie-clinic.vercel.app/">
+<meta name="robots" content="index, follow">
+
+<!-- Open Graph / social share preview -->
+<meta property="og:title" content="Binnie Clinic 🐰 — a STAY-coded period diary">
+<meta property="og:description" content="A cute period & cycle tracker made for Stray Kids STAYs — mood logging, symptom tracking, self-care tips, and cycle predictions.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://binnie-clinic.vercel.app/">
+
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FF6FA0">
+<link rel="icon" type="image/png" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Binnie Clinic">
+<meta property="og:image" content="https://binnie-clinic.vercel.app/icon-512.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+<style>
+  :root{
+    --pink-bg: #FFF7EF;
+    --pink-card: #FFFFFF;
+    --pink-soft: #FFE1EC;
+    --pink-accent: #FF6FA0;
+    --pink-accent-dark: #E8447F;
+    --pink-text: #4A2233;
+    --pink-muted: #A9748B;
+    --pink-border: #FFC7DD;
+
+    --dark-bg: #14090D;
+    --dark-card: #1F1216;
+    --dark-soft: #2B1319;
+    --dark-accent: #FF2E4D;
+    --dark-accent-dark: #C81E3A;
+    --dark-text: #FBE7EC;
+    --dark-muted: #C98A9A;
+    --dark-border: #3A1620;
+
+    --bg: var(--pink-bg);
+    --card: var(--pink-card);
+    --soft: var(--pink-soft);
+    --accent: var(--pink-accent);
+    --accent-dark: var(--pink-accent-dark);
+    --text: var(--pink-text);
+    --muted: var(--pink-muted);
+    --border: var(--pink-border);
+  }
+
+  [data-theme="dark"]{
+    --bg: var(--dark-bg);
+    --card: var(--dark-card);
+    --soft: var(--dark-soft);
+    --accent: var(--dark-accent);
+    --accent-dark: var(--dark-accent-dark);
+    --text: var(--dark-text);
+    --muted: var(--dark-muted);
+    --border: var(--dark-border);
+  }
+
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    font-family: 'Fredoka', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: background .4s ease, color .4s ease;
+    min-height:100vh;
+    position:relative;
+    overflow-x:hidden;
+  }
+
+  /* ---------- emoji ambient background (chicks / strawberries / cheese) ---------- */
+  .bg-pattern{
+    position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+  }
+  .bg-emoji{
+    position:absolute; font-size:1.6rem; opacity:.28; user-select:none;
+    filter: saturate(.9);
+  }
+  [data-theme="dark"] .bg-emoji{ opacity:.14; }
+
+  /* ---------- ship match game ---------- */
+  .ship-hint{ font-size:.82rem; color:var(--muted); margin:0 0 14px; line-height:1.5; }
+  .ship-arena{
+    position:relative; width:100%; height:340px; border-radius:18px;
+    background: var(--soft); border:1.5px solid var(--border); overflow:hidden; touch-action:none;
+  }
+  .ship-bubble{
+    position:absolute; width:64px; height:64px; border-radius:50%;
+    background:var(--card); border:2px solid var(--border); box-shadow:0 4px 10px rgba(0,0,0,.12);
+    display:flex; align-items:center; justify-content:center; font-size:1.6rem;
+    cursor:grab; user-select:none; touch-action:none;
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1), border-color .3s, box-shadow .3s;
+    animation: bob 3.4s ease-in-out infinite;
+  }
+  .ship-bubble:active{ cursor:grabbing; animation:none; }
+  .ship-bubble.dragging{ z-index:20; animation:none; box-shadow:0 10px 22px rgba(0,0,0,.2); }
+  .ship-bubble.matched{ border-color: var(--accent); box-shadow:0 0 0 4px rgba(255,111,160,.25); }
+  .ship-bubble.shake{ animation: shake .45s ease; }
+  .ship-bubble .name{
+    position:absolute; bottom:-20px; left:50%; transform:translateX(-50%);
+    font-size:.62rem; font-weight:600; color:var(--muted); white-space:nowrap;
+  }
+  @keyframes bob{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-5px);} }
+  @keyframes shake{
+    0%,100%{ transform:translateX(0); }
+    20%{ transform:translateX(-8px); }
+    40%{ transform:translateX(7px); }
+    60%{ transform:translateX(-5px); }
+    80%{ transform:translateX(4px); }
+  }
+  .heart-pop{
+    position:absolute; pointer-events:none; font-size:1.3rem; opacity:1;
+    animation: heartPop 1s ease forwards;
+  }
+  @keyframes heartPop{
+    0%{ transform:translateY(0) scale(.6); opacity:1; }
+    100%{ transform:translateY(-40px) scale(1.3); opacity:0; }
+  }
+  .ship-reset{ margin-top:12px; }
+  .ship-reset button{ min-width:auto; padding:9px 16px; font-size:.8rem; flex:none; }
+
+  /* ---------- layout ---------- */
+  .wrap{ position:relative; z-index:2; max-width:640px; margin:0 auto; padding:38px 20px 70px; }
+
+  .title{
+    font-family:'Baloo 2', sans-serif; font-weight:800;
+    text-align:center; font-size:2.1rem; letter-spacing:.5px;
+    color:var(--accent-dark); margin:0 0 4px;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+  }
+  .title-icon{ width:1.15em; height:1.15em; border-radius:50%; object-fit:cover; flex:none; }
+  .subtitle{ text-align:center; color:var(--muted); margin:0 0 20px; font-size:.95rem; }
+
+  .help-row{ display:flex; justify-content:center; gap:10px; margin-bottom:28px; flex-wrap:wrap; }
+  .help-btn{
+    font-family:'Baloo 2', sans-serif; font-weight:700; font-size:.85rem;
+    border:1.5px solid var(--accent); background:var(--card); color:var(--accent-dark);
+    padding:10px 18px; border-radius:20px; cursor:pointer; transition: all .15s;
+  }
+  .help-btn:hover{ background:var(--accent); color:#fff; }
+
+  .card{
+    background:var(--card); border:1.5px solid var(--border);
+    border-radius:22px; padding:22px 22px 26px; margin-bottom:22px;
+    box-shadow: 0 8px 24px rgba(232,68,127,.08);
+  }
+
+  .section-label{
+    font-family:'Baloo 2', sans-serif; font-weight:700; font-size:1.02rem;
+    margin:0 0 14px; display:flex; align-items:center; gap:8px; color:var(--text);
+  }
+
+  label.field{ display:block; font-size:.85rem; color:var(--muted); margin:14px 0 6px; font-weight:600; }
+  input[type=date], input[type=number], input[type=text], textarea, select{
+    width:100%; padding:11px 13px; border-radius:14px; border:1.5px solid var(--border);
+    background: var(--bg); color:var(--text); font-family:inherit; font-size:.95rem;
+    outline:none; transition: border-color .2s;
+  }
+  input:focus, textarea:focus, select:focus{ border-color: var(--accent); }
+  textarea{ min-height:80px; resize:vertical; }
+  .hint{ font-size:.75rem; color:var(--muted); margin-top:4px; }
+
+  .mood-grid{ display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+  .mood-chip{
+    border:1.5px solid var(--border); background:var(--bg); border-radius:14px;
+    padding:8px 12px; font-size:.85rem; cursor:pointer; user-select:none; color:var(--text);
+    transition: all .15s;
+  }
+  .mood-chip.active{ background:var(--accent); border-color:var(--accent); color:#fff; transform:scale(1.05); }
+
+  .symptom-grid{ display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+  .symptom-chip{
+    border:1.5px solid var(--border); background:var(--bg); border-radius:14px;
+    padding:7px 12px; font-size:.8rem; cursor:pointer; color:var(--text);
+  }
+  .symptom-chip.active{ background:var(--soft); border-color:var(--accent); font-weight:600; }
+
+  .btn-row{ display:flex; flex-wrap:wrap; gap:10px; margin-top:20px; }
+  button{
+    font-family:'Baloo 2', sans-serif; font-weight:700; font-size:.92rem;
+    border:none; border-radius:16px; padding:13px 18px; cursor:pointer;
+    color:#fff; background:var(--accent); flex:1; min-width:140px;
+    transition: transform .12s, background .2s;
+  }
+  button:hover{ transform: translateY(-2px); background:var(--accent-dark); }
+  button.secondary{ background:var(--soft); color:var(--accent-dark); }
+  button.secondary:hover{ background:var(--border); }
+  button.ghost{ background:transparent; border:1.5px solid var(--border); color:var(--text); }
+
+  /* ---------- stats ---------- */
+  .stats-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:10px; margin-top:8px; }
+  .stat{ background:var(--soft); border-radius:16px; padding:14px 8px; text-align:center; }
+  .stat .num{ font-family:'Baloo 2',sans-serif; font-weight:800; font-size:1.4rem; color:var(--accent-dark); }
+  .stat .lbl{ font-size:.72rem; color:var(--muted); margin-top:2px; }
+
+  .predict-banner{
+    background:linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    color:#fff; border-radius:18px; padding:16px 18px; margin-top:16px;
+    font-size:.9rem; line-height:1.5;
+  }
+  .predict-banner b{ font-family:'Baloo 2', sans-serif; }
+
+  /* ---------- doctor binnie ---------- */
+  .binnie-card{
+    background: var(--soft); border-radius:20px; padding:18px 20px;
+    border:1.5px solid var(--border); display:flex; gap:14px; align-items:flex-start;
+  }
+  .binnie-avatar{
+    width:54px; height:54px; border-radius:50%; flex-shrink:0;
+    background: var(--card); border:2px solid var(--accent);
+    display:flex; align-items:center; justify-content:center; font-size:1.5rem;
+    overflow:hidden;
+  }
+  .binnie-avatar img{ width:100%; height:100%; object-fit:cover; }
+  .binnie-text b{ font-family:'Baloo 2', sans-serif; color:var(--accent-dark); }
+  .binnie-text p{ margin:6px 0 0; font-size:.9rem; line-height:1.55; }
+  .binnie-refresh{ margin-top:10px; }
+  .binnie-refresh button{ padding:8px 14px; font-size:.78rem; min-width:auto; flex:none; }
+
+  /* ---------- entries list ---------- */
+  .entry{
+    border:1.5px solid var(--border); border-radius:16px; padding:12px 14px; margin-bottom:10px;
+    background:var(--bg);
+  }
+  .entry .row1{ display:flex; justify-content:space-between; font-size:.85rem; font-weight:600; }
+  .entry .row2{ font-size:.8rem; color:var(--muted); margin-top:4px; }
+  .entry .tags{ margin-top:6px; display:flex; gap:6px; flex-wrap:wrap; }
+  .entry .tag{ background:var(--soft); color:var(--accent-dark); font-size:.7rem; padding:3px 8px; border-radius:10px; }
+  .delete-entry{
+    background:none; border:none; cursor:pointer; font-size:.9rem; padding:2px 4px;
+    flex:none; min-width:auto; opacity:.7; transition: opacity .15s, transform .15s;
+  }
+  .delete-entry:hover{ opacity:1; transform:scale(1.15); background:none; }
+  .empty{ text-align:center; color:var(--muted); font-size:.85rem; padding:20px 0; }
+
+  .footer{ text-align:center; color:var(--muted); font-size:.78rem; margin-top:30px; line-height:1.6; }
+
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(120%);
+    background:var(--accent-dark); color:#fff; padding:14px 22px; border-radius:16px;
+    font-family:'Baloo 2',sans-serif; font-weight:600; font-size:.85rem; z-index:50;
+    transition: transform .3s ease; box-shadow:0 8px 20px rgba(0,0,0,.2);
+    max-width:calc(100% - 40px); width:340px; text-align:center; line-height:1.5;
+  }
+  .toast.show{ transform:translateX(-50%) translateY(0); }
+
+  /* ---------- help modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:100;
+    display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay.show{ display:flex; }
+  .modal{
+    background:var(--card); border-radius:24px; padding:26px 24px; max-width:480px; width:100%;
+    max-height:85vh; overflow-y:auto; border:1.5px solid var(--border);
+  }
+  .modal h2{ font-family:'Baloo 2', sans-serif; color:var(--accent-dark); margin:0 0 4px; font-size:1.3rem; }
+  .modal .modal-sub{ font-size:.82rem; color:var(--muted); margin-bottom:16px; }
+  .modal h3{ font-family:'Baloo 2', sans-serif; font-size:.95rem; color:var(--text); margin:16px 0 6px; }
+  .modal p, .modal li{ font-size:.87rem; line-height:1.6; color:var(--text); }
+  .modal ul{ margin:4px 0; padding-left:20px; }
+  .modal-close{ margin-top:16px; width:100%; }
+  .modal-note{ background:var(--soft); border-radius:14px; padding:12px 14px; font-size:.8rem; margin-top:14px; color:var(--muted); }
+
+  /* ---------- background theme layer ---------- */
+  .bg-theme-layer{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-repeat:repeat; background-size:170px auto;
+    opacity:0; transition: opacity .4s ease;
+  }
+  .bg-theme-layer.show{ opacity:.16; }
+  [data-theme="dark"] .bg-theme-layer.show{ opacity:.1; }
+
+  /* ---------- background picker (settings) ---------- */
+  .bg-picker{ display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
+  .bg-option{ display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; width:64px; }
+  .bg-swatch{
+    width:58px; height:58px; border-radius:16px; border:2px solid var(--border);
+    background-color:var(--soft); background-size:cover; background-position:center;
+    display:flex; align-items:center; justify-content:center; font-size:.7rem;
+    transition: border-color .15s, transform .15s;
+  }
+  .bg-swatch-emoji{ font-size:1.1rem; }
+  .bg-option span{ font-size:.7rem; color:var(--muted); font-weight:600; }
+  .bg-option.active .bg-swatch{ border-color:var(--accent); transform:scale(1.06); box-shadow:0 0 0 3px rgba(255,111,160,.2); }
+
+  /* ---------- update banner ---------- */
+  .update-banner{
+    position:fixed; top:14px; left:50%; transform:translateX(-50%) translateY(-140%);
+    z-index:80; background:var(--card); border:1.5px solid var(--accent);
+    border-radius:18px; padding:12px 16px; max-width:420px; width:calc(100% - 32px);
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px; justify-content:space-between;
+    box-shadow:0 10px 26px rgba(0,0,0,.18); font-size:.82rem; color:var(--text);
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+  }
+  .update-banner.show{ transform:translateX(-50%) translateY(0); }
+  .update-banner button{
+    flex:none; min-width:auto; padding:8px 14px; font-size:.78rem; margin:0;
+  }
+
+  /* ---------- dwaekki speech bubble ---------- */
+  .dwaekki-bubble{
+    display:flex; align-items:center; gap:10px; background:var(--soft);
+    border:1.5px solid var(--border); border-radius:18px; padding:10px 14px;
+    margin:0 0 18px; font-size:.85rem; color:var(--text); transition: opacity .3s ease;
+  }
+  .dwaekki-bubble img{ width:32px; height:32px; border-radius:50%; flex:none; border:2px solid var(--accent); }
+  .dwaekki-bubble b{ font-family:'Baloo 2', sans-serif; color:var(--accent-dark); }
+
+  /* ---------- welcome check-in card ---------- */
+  .welcome-text{ font-size:.9rem; line-height:1.6; margin:0 0 12px; }
+  .checkin-label{ font-size:.85rem; font-weight:700; color:var(--text); margin:14px 0 8px; }
+  .checkin-response{
+    margin-top:14px; background:var(--soft); border-radius:14px; padding:12px 14px;
+    font-size:.85rem; line-height:1.5; color:var(--text);
+  }
+  .checkin-response b{ font-family:'Baloo 2', sans-serif; color:var(--accent-dark); }
+
+  /* ---------- cycle overview + timeline ---------- */
+  .cycle-overview{ margin-top:16px; font-size:.85rem; line-height:1.9; color:var(--text); }
+  .cycle-overview b{ color:var(--accent-dark); }
+  .cycle-timeline{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-top:14px; padding:12px 6px; background:var(--soft); border-radius:14px;
+  }
+  .cycle-timeline .stage{
+    display:flex; flex-direction:column; align-items:center; gap:4px; font-size:1.1rem;
+    opacity:.4; flex:1; position:relative;
+  }
+  .cycle-timeline .stage.active{ opacity:1; transform:scale(1.15); }
+  .cycle-timeline .stage span.lbl{ font-size:.6rem; color:var(--muted); font-weight:600; }
+  .cycle-timeline .connector{ flex:1; height:2px; background:var(--border); margin-top:-14px; }
+  .predict-disclaimer{ font-size:.72rem; opacity:.8; margin-top:6px; display:block; }
+
+  /* ---------- symptom-based binnie tips ---------- */
+  .binnie-symptom-grid{ display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 4px; }
+  .binnie-symptom-chip{
+    border:1.5px solid var(--border); background:var(--card); border-radius:14px;
+    padding:7px 12px; font-size:.78rem; cursor:pointer; color:var(--text);
+  }
+  .binnie-symptom-chip.active{ background:var(--accent); border-color:var(--accent); color:#fff; }
+
+  /* ---------- diary-style entries ---------- */
+  .diary-lock-note{ font-size:.75rem; color:var(--muted); margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+  .diary-date{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:.9rem; color:var(--accent-dark); margin:16px 0 8px; }
+  .diary-date:first-child{ margin-top:0; }
+  .diary-entry{
+    border:1.5px solid var(--border); border-radius:16px; padding:12px 14px; margin-bottom:10px;
+    background:var(--bg); font-size:.85rem; line-height:1.7;
+  }
+  .diary-entry .diary-actions{ display:flex; gap:10px; margin-top:8px; }
+  .diary-entry .diary-actions button{
+    flex:none; min-width:auto; padding:5px 10px; font-size:.72rem; background:var(--soft); color:var(--accent-dark);
+  }
+
+  /* ---------- night clinic banner ---------- */
+  .night-banner{
+    display:none; background:linear-gradient(135deg, var(--dark-accent-dark) 0%, #4A1B2C 100%);
+    color:#fff; border-radius:18px; padding:14px 18px; margin-bottom:22px; font-size:.85rem; line-height:1.5;
+  }
+  .night-banner.show{ display:block; }
+  .night-banner b{ font-family:'Baloo 2', sans-serif; }
+
+  /* ---------- privacy ---------- */
+  .privacy-box{
+    background:var(--soft); border:1.5px solid var(--border); border-radius:14px;
+    padding:12px 14px; margin-top:14px;
+  }
+  .privacy-title{ font-family:'Baloo 2', sans-serif; font-weight:700; color:var(--accent-dark); font-size:.88rem; margin-bottom:4px; }
+  .privacy-text{ font-size:.78rem; color:var(--muted); line-height:1.5; }
+  .privacy-list{ margin:10px 0; padding-left:20px; font-size:.85rem; color:var(--text); line-height:1.7; }
+  .privacy-warning{ font-size:.78rem; color:var(--muted); background:var(--soft); border-radius:12px; padding:10px 12px; margin-bottom:4px; }
+  .modal-close.danger{
+    background:#fff0f0; color:#c0392b; border:1.5px solid #e8a9a0;
+  }
+  button.danger{ background:#c0392b; color:#fff; }
+
+  /* ---------- reminders ---------- */
+  .reminder-hint{ font-size:.75rem; color:var(--muted); margin:-4px 0 10px; }
+  .reminder-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px dashed var(--border); }
+  .reminder-row:last-of-type{ border-bottom:none; }
+  .reminder-title{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:.85rem; color:var(--text); }
+  .reminder-desc{ font-size:.75rem; color:var(--muted); margin-top:2px; }
+  .toggle-switch{
+    border:1.5px solid var(--border); background:var(--bg); color:var(--muted);
+    border-radius:20px; padding:6px 16px; font-family:'Baloo 2', sans-serif; font-weight:700;
+    font-size:.76rem; cursor:pointer; transition: all .15s; flex:none; min-width:54px;
+  }
+  .toggle-switch.on{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .reminder-sub{ font-size:.8rem; padding:2px 0 10px; color:var(--text); display:flex; align-items:center; gap:8px; }
+  .reminder-sub select, .reminder-sub input[type="time"]{
+    border:1.5px solid var(--border); border-radius:10px; padding:5px 10px;
+    font-family:'Fredoka', sans-serif; font-size:.8rem; background:var(--card); color:var(--text);
+  }
+  .reminder-note{ font-size:.75rem; color:var(--muted); background:var(--soft); border-radius:12px; padding:10px 12px; margin-top:10px; }
+
+  /* ---------- connect corners ---------- */
+  .footer-row{ display:flex; justify-content:center; margin:-10px 0 20px; }
+  .connect-card{ background:var(--soft); border:1.5px solid var(--border); border-radius:16px; padding:14px 16px; margin:12px 0; }
+  .connect-card-title{ font-family:'Baloo 2', sans-serif; font-weight:700; color:var(--accent-dark); font-size:.9rem; margin-bottom:6px; }
+  .connect-text{ font-size:.82rem; color:var(--text); line-height:1.6; margin:0 0 8px; }
+  .connect-links{ display:flex; flex-direction:column; gap:6px; margin-bottom:8px; }
+  .connect-links a{ font-size:.8rem; color:var(--accent-dark); text-decoration:none; font-weight:600; }
+  .connect-links a:hover{ text-decoration:underline; }
+  .connect-signoff{ font-size:.78rem; color:var(--muted); font-style:italic; margin:0; }
+  .connect-changelog ul{ margin:6px 0 0; padding-left:18px; font-size:.8rem; color:var(--text); line-height:1.7; }
+
+  /* ---------- install banner ---------- */
+  .install-card{
+    display:flex; align-items:center; gap:12px; background:var(--soft);
+    border:1.5px solid var(--border); border-radius:18px; padding:14px 16px; margin-bottom:18px;
+  }
+  .install-icon{ font-size:1.6rem; flex:none; }
+  .install-text{ flex:1; }
+  .install-text b{ font-family:'Baloo 2', sans-serif; color:var(--accent-dark); font-size:.9rem; }
+  .install-text p{ font-size:.78rem; color:var(--muted); margin:2px 0 0; }
+  #installActionBtn{ flex:none; min-width:auto; padding:9px 16px; font-size:.8rem; }
+
+  /* ---------- STAY ID teaser ---------- */
+  .stayid-teaser{
+    background:linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    color:#fff; border-radius:20px; padding:18px 20px; margin-bottom:22px; text-align:center;
+  }
+  .stayid-teaser-badge{ font-size:.7rem; font-weight:700; letter-spacing:.5px; opacity:.9; margin-bottom:6px; }
+  .stayid-teaser-title{ font-family:'Baloo 2', sans-serif; font-weight:800; font-size:1.15rem; margin-bottom:6px; }
+  .stayid-teaser-img{
+    display:block; width:100%; max-width:340px; margin:4px auto 12px; border-radius:12px;
+    box-shadow:0 8px 20px rgba(0,0,0,.18);
+  }
+  .stayid-teaser-text{ font-size:.82rem; line-height:1.5; opacity:.95; margin:0 0 14px; }
+  .stayid-teaser button{ background:#fff; color:var(--accent-dark); min-width:auto; padding:10px 20px; }
+  .stayid-teaser button:hover{ background:var(--soft); }
+
+  /* ---------- STAY ID generator ---------- */
+  .stayid-preview-wrap{ margin-top:20px; }
+  .stayid-card-stage{ display:flex; justify-content:center; container-type: inline-size; }
+
+  /* ---------- STAY ID photo crop modal ---------- */
+  .crop-stage{ width:100%; height:300px; background:#1a1216; border-radius:14px; overflow:hidden; margin-top:2px; }
+  .crop-stage img{ display:block; max-width:100%; }
+  .cropper-view-box, .cropper-face{ border-radius:0; }
+  #stayIdCropConfirm, #stayIdCropCancel{ flex:1; }
+
+  .stayid-card{
+    position:relative; width:100%; max-width:480px; aspect-ratio:1.85/1;
+    border-radius:14px; overflow:hidden; font-family:'Fredoka', sans-serif;
+    box-shadow:0 10px 26px rgba(0,0,0,.18), 0 2px 6px rgba(0,0,0,.08);
+  }
+
+  /* --- front --- */
+  .stayid-front{
+    display:flex; color:#4A2233; position:relative;
+    background-color:#F3E3DC;
+    background-image:
+      radial-gradient(ellipse 60% 50% at 8% 12%, rgba(255,255,255,.55), transparent 60%),
+      radial-gradient(ellipse 50% 40% at 95% 90%, rgba(190,140,130,.15), transparent 60%),
+      radial-gradient(ellipse 40% 60% at 100% 10%, rgba(190,140,130,.12), transparent 55%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    box-shadow: inset 0 0 0 1px rgba(74,34,51,.08), inset 0 0 18px rgba(120,60,60,.06);
+  }
+  .stayid-front::after{
+    content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 200'%3E%3Cg fill='none' stroke='%23E8447F' stroke-width='3' opacity='0.10'%3E%3Cpolygon points='230,20 245,70 300,70 255,100 272,150 230,120 188,150 205,100 160,70 215,70'/%3E%3Cpolygon points='150,110 158,135 185,135 163,150 171,175 150,160 129,175 137,150 115,135 142,135'/%3E%3C/g%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right center; background-size:70% auto;
+  }
+  .stayid-corner{
+    position:absolute; width:13%; aspect-ratio:1; z-index:2; opacity:.85;
+    background: repeating-linear-gradient(45deg, #FF6FA0 0 12%, transparent 12% 26%);
+  }
+  .stayid-corner.tl{ top:0; left:0; clip-path:polygon(0 0, 100% 0, 0 100%); }
+  .stayid-corner.tr{ top:0; right:0; clip-path:polygon(0 0, 100% 0, 100% 100%); }
+  .stayid-left{ width:34%; padding:3.5% 3%; display:flex; flex-direction:column; gap:5%; position:relative; z-index:1; }
+  .stayid-logo{ display:flex; align-items:center; position:relative; z-index:1; height:9cqw; }
+  .stayid-logo-pill{
+    display:flex; align-items:center; justify-content:center; flex:1;
+    border:1.5px solid #E8447F; border-radius:999px; margin-left:-3.5cqw; padding:0.4cqw 3cqw 0.4cqw 6cqw;
+    font-family:'Baloo 2',sans-serif; font-weight:700; font-style:italic; color:#E8447F;
+    letter-spacing:.3px; white-space:nowrap; font-size:6px; font-size:2.15cqw; background:rgba(255,255,255,.35);
+  }
+  .stayid-bunny{ width:22px; width:7.5cqw; flex:none; aspect-ratio:1; position:relative; z-index:2; filter:drop-shadow(0 1px 1px rgba(0,0,0,.08)); }
+  .stayid-photo{
+    flex:1; background:#AFAAA8; border:1.5px solid #E8447F; border-radius:3px;
+    display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; min-height:60px;
+  }
+  .stayid-photo img{ width:100%; height:100%; object-fit:cover; }
+  .stayid-photo-placeholder{ color:#fff; font-weight:600; text-align:center; line-height:1.5; opacity:.9;
+    font-size:6.5px; font-size:2.1cqw; }
+  .stayid-photo-placeholder svg{ width:16px; width:5.2cqw; margin-bottom:2px; }
+  .stayid-ribbon{
+    background:#E8447F; color:#fff; font-family:'Baloo 2',sans-serif; font-weight:700;
+    text-align:center; padding:4% 0; border-radius:2px; font-size:6.5px; font-size:2.1cqw;
+    position:relative; overflow:hidden;
+  }
+  .stayid-barcode{
+    height:6%; background:repeating-linear-gradient(90deg, #1a1a1a 0 1px, transparent 1px 2px, #1a1a1a 2px 3px, transparent 3px 3.6px, #1a1a1a 3.6px 5px, transparent 5px 5.6px);
+    opacity:.85;
+  }
+  .stayid-divider{ width:1.5px; background:repeating-linear-gradient(180deg, #E8447F 0 5px, transparent 5px 11px); opacity:.5; position:relative; z-index:1; }
+  .stayid-right{ flex:1; padding:3% 3.5%; position:relative; z-index:1; }
+  .stayid-heading-row{ display:flex; align-items:center; gap:2%; }
+  .stayid-heading{ font-family:'Baloo 2',sans-serif; font-weight:800; color:#E8447F; line-height:1;
+    font-size:20px; font-size:7.4cqw; text-shadow:.5px .5px 0 rgba(232,68,127,.25); }
+  .stayid-startrail{ width:44px; width:15cqw; flex:none; }
+  .stayid-subheading{ font-weight:700; color:#E8447F; letter-spacing:.5px; border-bottom:1.5px solid #E8447F;
+    padding-bottom:1.5%; margin-bottom:3%; font-size:6.5px; font-size:2.1cqw; opacity:.9; }
+  .stayid-field-label{ font-weight:700; color:#E8447F; margin-top:2.5%; font-size:6.5px; font-size:2.1cqw; }
+  .stayid-field-box{
+    border:1.3px solid #E8447F; border-radius:2px; padding:1.5% 3%; font-weight:600; color:#B76B8A;
+    text-transform:uppercase; margin-top:1%; min-height:14px; font-size:9.5px; font-size:2.9cqw;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; background:rgba(255,255,255,.3);
+  }
+  .stayid-field-box.filled{ color:#4A2233; background:rgba(255,255,255,.55); }
+  .stayid-static{ font-weight:700; color:#55505C; text-transform:uppercase; font-size:9.5px; font-size:2.9cqw; }
+  .stayid-bottom-row{ display:flex; align-items:flex-end; justify-content:space-between; margin-top:3%; gap:6px; }
+  .stayid-stamp{
+    border:1.3px solid #E8447F; color:#E8447F; border-radius:3px; padding:2% 3%; text-align:center;
+    transform:rotate(-7deg); line-height:1.15; font-size:5.2px; font-size:1.6cqw; background:rgba(255,255,255,.35);
+    display:flex; flex-direction:column; align-items:center; gap:1px;
+  }
+  .stayid-stamp svg{ width:10px; width:3.2cqw; }
+  .stayid-holo-wrap{ position:relative; width:26px; width:9.5cqw; aspect-ratio:1; flex:none; }
+  .stayid-holo{
+    position:absolute; inset:0; border-radius:4px;
+    background:conic-gradient(from 90deg, #ff9fc4, #ffe29f, #9fffe2, #9fc4ff, #ff9fc4);
+    transform:rotate(12deg); box-shadow:0 0 0 1px rgba(0,0,0,.08);
+  }
+  .stayid-holo-star{ position:absolute; inset:14%; }
+  .stayid-idcode{ font-family:'Courier New',monospace; color:#55505C; margin-top:2%; letter-spacing:.5px; opacity:.85;
+    font-size:7px; font-size:2.3cqw; }
+
+</style>
+</head>
+<body data-theme="light">
+
+<div class="bg-pattern" id="bgPattern"></div>
+<div class="bg-theme-layer" id="bgThemeLayer"></div>
+
+<div class="update-banner" id="updateBanner">
+  <span>🐷 A new Clinic update is ready! We've added some new things for you. ✨</span>
+  <button id="updateNowBtn" type="button">Update now</button>
+</div>
+
+<div class="wrap">
+
+  <h1 class="title"><img class="title-icon" src="/icon-192.png" alt="Binnie Clinic"> Binnie Clinic</h1>
+  <p class="subtitle" id="subtitle">a lil STAY-coded diary for your cycle · created by Tulika (@minberrydiary) 💗</p>
+
+  <div class="dwaekki-bubble" id="dwaekkiBubble">
+    <img src="/icon-192.png" alt="Dwaekki">
+    <div><b>Dwaekki:</b> <span id="dwaekkiText">STAY! You're here!! 🐰</span></div>
+  </div>
+
+  <div class="night-banner" id="nightBanner">
+    <b>🌙 Night Clinic is open.</b> You've done enough for today. Rest is allowed. 🐰💗
+  </div>
+
+  <div class="install-card" id="installCard" style="display:none;">
+    <div class="install-icon">📲</div>
+    <div class="install-text">
+      <b>Install Binnie Clinic</b>
+      <p>Keep your little clinic on your phone 💗</p>
+    </div>
+    <button type="button" class="secondary" id="installActionBtn">Install 🐰</button>
+  </div>
+
+  <div class="stayid-teaser">
+    <div class="stayid-teaser-badge">🆕 NEW AT BINNIE CLINIC</div>
+    <div class="stayid-teaser-title">🪪 The STAY ID System</div>
+    <img class="stayid-teaser-img" src="/stayid-card-preview.png" alt="Preview of the Binnie Clinic STAY ID card">
+    <p class="stayid-teaser-text">Create your very own fictional Binnie Clinic STAY ID card — with your name &amp; photo. Fan-made, not a real ID! 💗</p>
+    <button type="button" id="stayIdTeaserBtn">Get My STAY ID →</button>
+  </div>
+
+  <div class="help-row">
+    <button class="help-btn" id="helpBtn" type="button">Need Help? 🐰</button>
+    <button class="help-btn" id="settingsBtn" type="button">⚙️ Settings</button>
+  </div>
+
+  <div class="footer-row">
+    <button class="help-btn" id="connectBtn" type="button">🍓 Connect Corners</button>
+  </div>
+
+  <!-- WELCOME CHECK-IN -->
+  <div class="card">
+    <div class="section-label">🩷 Welcome back, STAY!</div>
+    <p class="welcome-text">Binnie Clinic is your little space to check in, track your cycle, and take a moment for yourself.</p>
+    <div class="checkin-label">How are you feeling today?</div>
+    <div class="mood-grid" id="checkinMoodGrid">
+      <div class="mood-chip" data-mood="😊 Good">😊 Good</div>
+      <div class="mood-chip" data-mood="😐 Meh">😐 Meh</div>
+      <div class="mood-chip" data-mood="🥺 Low">🥺 Low</div>
+      <div class="mood-chip" data-mood="😤 Irritable">😤 Irritable</div>
+      <div class="mood-chip" data-mood="😴 Tired">😴 Tired</div>
+      <div class="mood-chip" data-mood="🥰 Soft">🥰 Soft</div>
+    </div>
+    <div class="checkin-response" id="checkinResponse" style="display:none;"></div>
+  </div>
+
+  <!-- STATS + PREDICTION -->
+  <div class="card">
+    <div class="section-label">📊 Your Stats</div>
+    <div class="stats-grid">
+      <div class="stat"><div class="num" id="statStreak">0</div><div class="lbl">entries logged</div></div>
+      <div class="stat"><div class="num" id="statAvgCycle">–</div><div class="lbl">avg cycle (days)</div></div>
+      <div class="stat"><div class="num" id="statTopMood">–</div><div class="lbl">top mood</div></div>
+    </div>
+
+    <div class="cycle-overview" id="cycleOverview"></div>
+
+    <div class="cycle-timeline" id="cycleTimeline">
+      <div class="stage" data-stage="period"><span>🩸</span><span class="lbl">Period</span></div>
+      <div class="connector"></div>
+      <div class="stage" data-stage="follicular"><span>🌱</span><span class="lbl">Follicular</span></div>
+      <div class="connector"></div>
+      <div class="stage" data-stage="fertile"><span>🌸</span><span class="lbl">Fertile</span></div>
+      <div class="connector"></div>
+      <div class="stage" data-stage="luteal"><span>✨</span><span class="lbl">Luteal</span></div>
+    </div>
+
+    <div class="predict-banner" id="predictBanner">
+      Log a couple entries and I'll start predicting your next cycle 🔮
+    </div>
+  </div>
+
+  <!-- DR BINNIE -->
+  <div class="card">
+    <div class="section-label">🩺 Dr. Binnie's Corner</div>
+    <div class="binnie-card">
+      <div class="binnie-avatar"><img src="/icon-192.png" alt="Dr. Binnie"></div>
+      <div class="binnie-text">
+        <b>What's bothering you today?</b>
+        <div class="binnie-symptom-grid" id="binnieSymptomGrid">
+          <div class="binnie-symptom-chip" data-s="cramps">😣 Cramps</div>
+          <div class="binnie-symptom-chip" data-s="fatigue">😴 Fatigue</div>
+          <div class="binnie-symptom-chip" data-s="headache">🤕 Headache</div>
+          <div class="binnie-symptom-chip" data-s="cravings">🍫 Cravings</div>
+          <div class="binnie-symptom-chip" data-s="nausea">😵 Nausea</div>
+          <div class="binnie-symptom-chip" data-s="mood">💭 Mood</div>
+        </div>
+        <p id="binnieTip">Loading today's advice...</p>
+        <div class="binnie-refresh"><button id="binnieBtn" class="secondary" type="button">🎲 Give me a random tip</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOG ENTRY -->
+  <div class="card">
+    <div class="section-label">📅 Log Today</div>
+
+    <label class="field">📅 Period Start Date</label>
+    <input type="date" id="startDate">
+
+    <label class="field">🩲 Period Length (days)</label>
+    <input type="number" id="periodLength" min="1" max="10" placeholder="Usually 4–7 days">
+    <div class="hint">Usually 4–7 days</div>
+
+    <label class="field">🔁 Cycle Length (days)</label>
+    <input type="number" id="cycleLength" min="15" max="45" placeholder="28" value="28">
+    <div class="hint">Default is 28 if unsure</div>
+
+    <label class="field">🎭 Mood Today</label>
+    <div class="mood-grid" id="moodGrid">
+      <div class="mood-chip" data-mood="😊 Good">😊 Good</div>
+      <div class="mood-chip" data-mood="😐 Meh">😐 Meh</div>
+      <div class="mood-chip" data-mood="😢 Low">😢 Low</div>
+      <div class="mood-chip" data-mood="😡 Irritable">😡 Irritable</div>
+      <div class="mood-chip" data-mood="😴 Tired">😴 Tired</div>
+      <div class="mood-chip" data-mood="🥰 Soft">🥰 Soft</div>
+    </div>
+
+    <label class="field">🌡️ Symptoms (tap all that apply)</label>
+    <div class="symptom-grid" id="symptomGrid">
+      <div class="symptom-chip" data-symptom="Cramps">Cramps</div>
+      <div class="symptom-chip" data-symptom="Bloating">Bloating</div>
+      <div class="symptom-chip" data-symptom="Headache">Headache</div>
+      <div class="symptom-chip" data-symptom="Fatigue">Fatigue</div>
+      <div class="symptom-chip" data-symptom="Cravings">Cravings</div>
+      <div class="symptom-chip" data-symptom="Backache">Backache</div>
+      <div class="symptom-chip" data-symptom="Nausea">Nausea</div>
+      <div class="symptom-chip" data-symptom="Acne">Acne</div>
+    </div>
+
+    <label class="field">📝 Notes</label>
+    <textarea id="notes" placeholder="Light cramps, watched SKZ VLive, wanted chocolate..."></textarea>
+
+    <div class="btn-row">
+      <button id="saveBtn" type="button">💾 Save Entry</button>
+      <button id="viewBtn" class="secondary" type="button">📖 View All Entries</button>
+      <button id="toggleBtn" class="ghost" type="button">🌓 Toggle Mode</button>
+    </div>
+  </div>
+
+  <!-- ENTRIES -->
+  <div class="card" id="entriesCard" style="display:none;">
+    <div class="section-label">📋 My Clinic Diary</div>
+    <div class="diary-lock-note">🔒 Stored on this device only — never uploaded anywhere</div>
+    <div id="entriesList"></div>
+  </div>
+
+  <!-- STAY ID CARD -->
+  <div class="card" id="stayIdSection">
+    <div class="section-label">🪪 STAY ID Card</div>
+
+    <label class="field" style="margin-top:0;">Your Name</label>
+    <input type="text" id="stayIdName" maxlength="20" placeholder="ENTER YOUR NAME">
+
+    <label class="field">Upload Photo</label>
+    <input type="file" id="stayIdPhoto" accept="image/png,image/jpeg,image/webp">
+    <p class="hint">Pick a photo and you'll get to drag &amp; zoom it into place before it goes on your ID 🐰</p>
+
+    <div class="stayid-preview-wrap">
+      <div class="stayid-card-stage">
+        <!-- FRONT -->
+        <div class="stayid-card stayid-front" id="stayIdFront">
+          <div class="stayid-corner tl"></div>
+          <div class="stayid-corner tr"></div>
+          <div class="stayid-left">
+            <div class="stayid-logo">
+              <svg class="stayid-bunny" viewBox="0 0 40 40" aria-hidden="true">
+                <ellipse cx="14" cy="10" rx="4" ry="10" fill="#fff" stroke="#E8447F" stroke-width="2"/>
+                <ellipse cx="26" cy="10" rx="4" ry="10" fill="#fff" stroke="#E8447F" stroke-width="2"/>
+                <circle cx="20" cy="26" r="12" fill="#fff" stroke="#E8447F" stroke-width="2"/>
+                <circle cx="16" cy="24" r="1.6" fill="#4A2233"/>
+                <circle cx="24" cy="24" r="1.6" fill="#4A2233"/>
+                <path d="M17 29 Q20 32 23 29" stroke="#4A2233" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+              </svg>
+              <div class="stayid-logo-pill">BINNIE CLINIC</div>
+            </div>
+            <div class="stayid-photo" id="stayIdPhotoBox">
+              <span class="stayid-photo-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" aria-hidden="true">
+                  <rect x="2" y="7" width="20" height="14" rx="2.5"/>
+                  <path d="M8 7l1.6-2.6h4.8L16 7"/>
+                  <circle cx="12" cy="14" r="4"/>
+                </svg><br>YOUR PHOTO HERE</span>
+            </div>
+            <div class="stayid-ribbon">★ BINNIE CLINIC</div>
+            <div class="stayid-barcode"></div>
+          </div>
+          <div class="stayid-divider"></div>
+          <div class="stayid-right">
+            <div class="stayid-heading-row">
+              <div class="stayid-heading">STAY ID</div>
+              <svg class="stayid-startrail" viewBox="0 0 60 30" aria-hidden="true">
+                <polygon points="10,2 12,9 19,9 13,13 15,20 10,16 5,20 7,13 1,9 8,9" fill="#E8447F"/>
+                <circle cx="30" cy="14" r="1.6" fill="#E8447F"/>
+                <circle cx="38" cy="10" r="1.2" fill="#E8447F"/>
+                <circle cx="45" cy="7" r="1" fill="#E8447F"/>
+                <polygon points="52,2 53,5 56,5 53.5,7 54.5,10 52,8 49.5,10 50.5,7 48,5 51,5" fill="#E8447F"/>
+              </svg>
+            </div>
+            <div class="stayid-subheading">BINNIE CLINIC • STAY IDENTIFICATION</div>
+            <div class="stayid-field-label">NAME</div>
+            <div class="stayid-field-box" id="stayIdCardName">YOUR NAME</div>
+            <div class="stayid-field-label">OCCUPANCY</div>
+            <div class="stayid-static">STAY</div>
+            <div class="stayid-bottom-row">
+              <div>
+                <div class="stayid-field-label">DATE OF ISSUE</div>
+                <div class="stayid-static" id="stayIdCardDate">DD/MM/YYYY</div>
+              </div>
+              <div class="stayid-stamp">
+                <svg viewBox="0 0 40 40" aria-hidden="true">
+                  <ellipse cx="14" cy="10" rx="4" ry="10" fill="none" stroke="#E8447F" stroke-width="2.5"/>
+                  <ellipse cx="26" cy="10" rx="4" ry="10" fill="none" stroke="#E8447F" stroke-width="2.5"/>
+                  <circle cx="20" cy="26" r="12" fill="none" stroke="#E8447F" stroke-width="2.5"/>
+                </svg>
+                BINNIE CLINIC<br>STAY DIVISION
+              </div>
+              <div class="stayid-holo-wrap">
+                <div class="stayid-holo"></div>
+                <svg class="stayid-holo-star" viewBox="0 0 40 40" aria-hidden="true">
+                  <polygon points="20,3 24,15 37,15 26,23 30,35 20,27 10,35 14,23 3,15 16,15" fill="none" stroke="#2C2C2A" stroke-width="1.5"/>
+                </svg>
+              </div>
+            </div>
+            <div class="stayid-idcode" id="stayIdCardCode">BC-STAY-XXXX</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button type="button" id="stayIdSaveBtn">🖨️ Save STAY ID</button>
+      <button type="button" class="secondary" id="stayIdShareBtn">📤 Share</button>
+      <button type="button" class="ghost" id="stayIdResetBtn">Reset</button>
+    </div>
+    <p class="hint">Sharing opens your phone's share sheet — pick Instagram, TikTok, or YouTube from there 💗 On desktop it just downloads the image so you can upload it yourself.</p>
+  </div>
+
+  <!-- SELF CARE -->
+  <div class="card">
+    <div class="section-label">🌸 Period Self-Care Tips (SKZ style)</div>
+    <div style="font-size:.9rem; line-height:2;">
+      • Listen to "Slump" and cry it out 😭<br>
+      • Heat pad + hoodie = comfort 🔥<br>
+      • Hydrate like Hyunjin hydrates his skin 💧<br>
+      • Watch SKZ Code, Chan's Room or 2 Kids Room 🚗<br>
+      • Rest.
+    </div>
+  </div>
+
+  <!-- SHIP MATCH GAME -->
+  <div class="card">
+    <div class="section-label">💌 Ship Match</div>
+    <p class="ship-hint">Drag two bubbles together — if it's meant to be, they'll pull in close. If not... they're bouncing right back apart 😭</p>
+    <div class="ship-arena" id="shipArena"></div>
+    <div class="ship-reset"><button class="secondary" id="shipReset" type="button">Reset bubbles 🔄</button></div>
+  </div>
+
+  <div class="footer">
+    Created by Tulika Soni 🌷 x STAY project 💗<br>
+    © 2026 "Binnie Clinic." Original fan-made project — not affiliated with JYP Entertainment.
+  </div>
+</div>
+
+<div class="toast" id="toast">Saved! 💾</div>
+
+<!-- HELP MODAL -->
+<div class="modal-overlay" id="helpOverlay">
+  <div class="modal">
+    <h2>New here? Welcome to the clinic 🐰</h2>
+    <div class="modal-sub">A quick, no-pressure explainer if you're just starting to track your period.</div>
+
+    <h3>What's actually happening?</h3>
+    <p>A period is your body shedding the uterus lining once a month if pregnancy hasn't happened — it's a completely normal, healthy part of the reproductive cycle, not something to be embarrassed about.</p>
+
+    <h3>The general numbers</h3>
+    <ul>
+      <li>First periods usually show up somewhere between ages 10–15, but everybody's timeline is different.</li>
+      <li>A "cycle" is counted from the first day of one period to the first day of the next — commonly around 21–35 days, with 28 being the textbook average.</li>
+      <li>The bleeding itself usually lasts about 3–7 days.</li>
+      <li>Irregular cycles are very common in the first couple years — it usually settles down over time.</li>
+    </ul>
+
+    <h3>What can help day-to-day</h3>
+    <ul>
+      <li>Pads, tampons, or menstrual cups are all normal options — it's personal preference, try what feels comfortable.</li>
+      <li>A heating pad or hot water bottle on the lower belly can ease cramps.</li>
+      <li>Staying hydrated and gentle movement (even just walking) can help with bloating and mood.</li>
+      <li>Keeping a few supplies in your bag removes a lot of the stress around surprise starts.</li>
+    </ul>
+
+    <h3>When to actually check in with a doctor</h3>
+    <ul>
+      <li>No period at all by around age 15–16.</li>
+      <li>Bleeding so heavy you're soaking through a pad/tampon every hour.</li>
+      <li>Pain that stops you from going about your day, even with rest or a heating pad.</li>
+      <li>Periods that suddenly become very irregular after being regular.</li>
+    </ul>
+    <div class="modal-note">This is general info to help you get oriented, not medical advice — a doctor or gynecologist is always the right call for anything that worries you.</div>
+
+    <button class="modal-close" id="closeHelp" type="button">Got it, thanks 🐰</button>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsOverlay">
+  <div class="modal">
+    <h2>Settings 🐰</h2>
+    <div class="modal-sub">Make the clinic feel like yours.</div>
+
+    <h3>Your name</h3>
+    <input type="text" id="nameInput" maxlength="20" placeholder="What should Dr. Binnie call you?">
+    <div class="hint">Used to say hi around the app — nothing leaves your device.</div>
+
+    <h3>Background</h3>
+    <div class="bg-picker" id="bgPicker">
+      <div class="bg-option" data-bg="emoji"><div class="bg-swatch bg-swatch-emoji">🐤🍓🧀</div><span>Classic</span></div>
+      <div class="bg-option" data-bg="bunny"><div class="bg-swatch" style="background-image:url('/bg-bunny.png')"></div><span>Bunny</span></div>
+      <div class="bg-option" data-bg="penguin"><div class="bg-swatch" style="background-image:url('/bg-penguin.png')"></div><span>Binnie</span></div>
+      <div class="bg-option" data-bg="puppy"><div class="bg-swatch" style="background-image:url('/bg-puppy.png')"></div><span>Puppy</span></div>
+      <div class="bg-option" data-bg="piggy"><div class="bg-swatch" style="background-image:url('/bg-piggy.png')"></div><span>Dwaekki</span></div>
+    </div>
+
+    <h3>🔔 Reminders</h3>
+    <div class="reminder-hint">Tiny nudges, completely optional.</div>
+
+    <div class="reminder-row">
+      <div class="reminder-info">
+        <div class="reminder-title">🩷 Period reminder</div>
+        <div class="reminder-desc">Get a gentle reminder around your estimated period.</div>
+      </div>
+      <button class="toggle-switch" id="reminderPeriodToggle" type="button">OFF</button>
+    </div>
+    <div class="reminder-sub" id="reminderPeriodSub" style="display:none;">
+      Remind me:
+      <select id="reminderPeriodDays">
+        <option value="1">1 day before</option>
+        <option value="2">2 days before</option>
+        <option value="3">3 days before</option>
+      </select>
+    </div>
+
+    <div class="reminder-row">
+      <div class="reminder-info">
+        <div class="reminder-title">💧 Self-care reminder</div>
+        <div class="reminder-desc">A little nudge to pause, hydrate, rest, or take care of yourself.</div>
+      </div>
+      <button class="toggle-switch" id="reminderSelfcareToggle" type="button">OFF</button>
+    </div>
+    <div class="reminder-sub" id="reminderSelfcareSub" style="display:none;">
+      🕐 <input type="time" id="reminderSelfcareTime">
+    </div>
+
+    <div class="reminder-row">
+      <div class="reminder-info">
+        <div class="reminder-title">📝 Daily check-in</div>
+        <div class="reminder-desc">A tiny reminder to log how you're feeling today.</div>
+      </div>
+      <button class="toggle-switch" id="reminderCheckinToggle" type="button">OFF</button>
+    </div>
+    <div class="reminder-sub" id="reminderCheckinSub" style="display:none;">
+      🕐 <input type="time" id="reminderCheckinTime">
+    </div>
+
+    <div class="reminder-note">🔕 You control them. Binnie Clinic never sends reminders unless you turn them on.</div>
+
+    <div class="modal-note" id="aboutNote">Binnie Clinic <span id="versionTag"></span> 🐷</div>
+
+    <h3>Privacy</h3>
+    <div class="privacy-box">
+      <div class="privacy-title">🔏 Your data stays your data</div>
+      <div class="privacy-text">Nothing you enter here is uploaded or stored on our servers. Everything lives in this browser, on this device, only.</div>
+    </div>
+    <button class="modal-close danger" id="openClearData" type="button">⚠️ Clear My Data</button>
+
+    <button class="modal-close" id="closeSettings" type="button">Done 🐰</button>
+  </div>
+</div>
+
+<!-- CONNECT CORNERS MODAL -->
+<div class="modal-overlay" id="connectOverlay">
+  <div class="modal">
+    <h2>🍓 Connect Corners</h2>
+    <div class="modal-sub">A tiny corner of Binnie Clinic for STAYs. 🐰💗</div>
+
+    <div class="connect-card">
+      <div class="connect-card-title">🌷 About the Creator</div>
+      <p class="connect-text">hiii!! I'm Tulika (aka Tuli 🌸)<br>I made Binnie Clinic as a little fan-made project for STAYs. 🐰💗</p>
+      <div class="connect-links">
+        <a href="https://youtube.com/@minberrydiary?si=9-ykiPeArmCa72M3" target="_blank" rel="noopener">📺 YouTube — @minberrydiary</a>
+        <a href="https://www.instagram.com/changbins_big.bakery" target="_blank" rel="noopener">📸 Instagram — @changbins_big.bakery</a>
+        <a href="https://www.instagram.com/.minberry" target="_blank" rel="noopener">📸 Instagram (personal) — @.minberry</a>
+      </div>
+      <p class="connect-signoff">Made with a little creativity, a lot of STAY love, and one very determined Tulika. 🐷💗</p>
+    </div>
+
+    <div class="connect-card">
+      <div class="connect-card-title">🐰 Binnie Corner</div>
+      <p class="connect-text"><b>Binnie Clinic <span id="connectVersionTag"></span></b></p>
+      <div class="connect-changelog">
+        <b>✨ What's new — v1.9.6</b>
+        <ul>
+          <li>🖼️ Added a real preview picture of the STAY ID card to the teaser up top</li>
+        </ul>
+        <b>✨ v1.9.5</b>
+        <ul>
+          <li>🪪 STAY ID Card now mirrors the real SKZ ID exactly — just Name &amp; Photo to fill in, everything else is fixed print</li>
+        </ul>
+        <b>✨ v1.9.4</b>
+        <ul>
+          <li>🖼️ Drag-&amp;-zoom photo cropping when you upload your STAY ID picture, just like a real ID kiosk</li>
+          <li>🪪 Simplified the STAY ID card — removed the Bias field and the flip-to-back side, added a STAY Since field instead</li>
+        </ul>
+        <b>✨ v1.9.2</b>
+        <ul>
+          <li>🪪 STAY ID Card — make a fictional Binnie Clinic ID with your name &amp; photo, save or share it</li>
+          <li>🐰 Closer-to-mockup card design — bunny badge, shooting-star flourish, holographic star sticker</li>
+          <li>🛠️ Fixed a bug where saving/sharing the STAY ID card could cut off or distort the card image</li>
+          <li>📲 Install Binnie Clinic — a proper install button (with iPhone instructions too)</li>
+          <li>🔔 Smart Reminders — optional period, self-care &amp; daily check-in reminders</li>
+          <li>🐰 Dwaekki Reactions — Dwaekki now reacts to your visits, entries, time of day &amp; settings</li>
+          <li>🍓 Connect Corners — meet the creator and learn more about Binnie Clinic</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="connect-card">
+      <div class="connect-card-title">💗 STAY Corner</div>
+      <p class="connect-text" style="margin-bottom:0;">Made for STAYs, wherever you are. 🌎💗</p>
+    </div>
+
+    <button class="modal-close" id="closeConnect" type="button">Done 🐰</button>
+  </div>
+</div>
+
+<!-- iOS INSTALL INSTRUCTIONS MODAL -->
+<div class="modal-overlay" id="iosInstallOverlay">
+  <div class="modal">
+    <h2>📲 Install Binnie Clinic</h2>
+    <div class="modal-sub">On iPhone/iPad, installing takes just a few taps in Safari.</div>
+    <ol style="padding-left:20px; font-size:.87rem; line-height:1.9; color:var(--text); margin:0;">
+      <li>Open Binnie Clinic in <b>Safari</b> 🌐</li>
+      <li>Tap the <b>Share</b> icon ⬆️</li>
+      <li>Tap <b>Add to Home Screen</b></li>
+      <li>Tap <b>Add</b> 💗</li>
+    </ol>
+    <div class="modal-note">🐰 That's it! Binnie Clinic will appear on your Home Screen like a real app.</div>
+    <button class="modal-close" id="closeIosInstall" type="button">Got it 🐰</button>
+  </div>
+</div>
+
+<!-- FIRST-VISIT NAME + PRIVACY PROMPT -->
+<div class="modal-overlay" id="namePromptOverlay">
+  <div class="modal">
+    <h2>Hi! Welcome to the clinic 🐰</h2>
+    <div class="modal-sub">What should we call you? 💗</div>
+    <input type="text" id="namePromptInput" maxlength="20" placeholder="Your name (or leave blank)">
+
+    <div class="privacy-box">
+      <div class="privacy-title">🔏 Your data stays your data</div>
+      <div class="privacy-text">Nothing you enter here is uploaded or stored on our servers. Your name, entries, and preferences are stored locally on your device only.</div>
+    </div>
+
+    <button class="modal-close" id="saveNamePrompt" type="button">Let's go 💗</button>
+  </div>
+</div>
+
+<!-- CLEAR DATA CONFIRMATION -->
+<div class="modal-overlay" id="clearDataOverlay">
+  <div class="modal">
+    <h2>Clear my data? 🥺</h2>
+    <div class="modal-sub">This will remove everything stored locally in this browser:</div>
+    <ul class="privacy-list">
+      <li>Your name</li>
+      <li>All logged cycle entries &amp; diary notes</li>
+      <li>Mood check-ins</li>
+      <li>Theme &amp; background preferences</li>
+    </ul>
+    <div class="privacy-warning">This cannot be undone unless you've exported or backed up your data yourself.</div>
+    <div class="btn-row">
+      <button class="secondary" id="cancelClearData" type="button">Cancel</button>
+      <button class="danger" id="confirmClearData" type="button">⚠️ Clear Data</button>
+    </div>
+  </div>
+</div>
+
+<!-- STAY ID PHOTO CROP MODAL -->
+<div class="modal-overlay" id="stayIdCropOverlay">
+  <div class="modal">
+    <h2>🖼️ Adjust Your Photo</h2>
+    <div class="modal-sub">Drag to move it around, scroll or pinch to zoom — get it looking just right. 💗</div>
+    <div class="crop-stage">
+      <img id="stayIdCropImg" src="" alt="Photo to crop">
+    </div>
+    <div class="btn-row" style="margin-top:16px;">
+      <button type="button" class="secondary" id="stayIdCropCancel">Cancel</button>
+      <button type="button" id="stayIdCropConfirm">Use This Photo 🐰</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js" defer></script>
+<script>
+  // ---------------- background emoji pattern (chick / strawberry / cheese) ----------------
+  const emojiSet = ['🐤','🐥','🍓','🧀','🍡'];
+  const bgPattern = document.getElementById('bgPattern');
+  const bgCount = 45;
+  for(let i=0;i<bgCount;i++){
+    const span = document.createElement('span');
+    span.className = 'bg-emoji';
+    span.textContent = emojiSet[Math.floor(Math.random()*emojiSet.length)];
+    span.style.top = (Math.random()*100) + '%';
+    span.style.left = (Math.random()*100) + '%';
+    span.style.transform = `rotate(${Math.floor(Math.random()*40 - 20)}deg)`;
+    span.style.fontSize = (1.1 + Math.random()*1.2) + 'rem';
+    bgPattern.appendChild(span);
+  }
+
+  // ---------------- state (persisted in localStorage — this is your real
+  // live site, so entries survive refreshes and browser restarts) ----------------
+  const STORAGE_KEY = 'binnieClinicEntries';
+  function loadEntries(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){ return []; }
+  }
+  function saveEntries(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)); }catch(e){}
+  }
+  let entries = loadEntries();
+  let selectedMood = null;
+  let selectedSymptoms = new Set();
+
+  // ---------------- user's name (declared early so randomTip() below can use it) ----------------
+  const NAME_KEY = 'binnieClinicName';
+  function getName(){ return (localStorage.getItem(NAME_KEY) || '').trim(); }
+  function setName(name){
+    try{ localStorage.setItem(NAME_KEY, name.trim()); }catch(e){}
+  }
+
+  // ---------------- visit tracking (for Dwaekki's "long time no see" + first-visit lines) ----------------
+  const LAST_VISIT_KEY = 'binnieClinicLastVisit';
+  const isFirstEverVisit = !localStorage.getItem(NAME_KEY + 'Seen');
+  const lastVisitStr = localStorage.getItem(LAST_VISIT_KEY);
+  const daysSinceLastVisit = lastVisitStr ? Math.floor((Date.now() - new Date(lastVisitStr).getTime()) / 86400000) : null;
+  try{ localStorage.setItem(LAST_VISIT_KEY, new Date().toISOString()); }catch(e){}
+
+  const binnieTips = [
+    "Heating pad on low + oversized hoodie = instant STAY-approved comfort. No notes.",
+    "Cravings hitting? Chocolate is basically a certified mood stabilizer today, go for it.",
+    "Cramps bad? Gentle stretching or just lying flat and watching a Stray Kids vlive both count as self-care.",
+    "Hydrate, {name}! Water bottle nearby, sip through the day like it's your job.",
+    "Low energy days are valid days, {name}. Rest isn't lazy, it's recovery — protect your nap time.",
+    "If you're irritable, that's okay too. Tell the people around you it's just today, not you.",
+    "A warm bath + a slow playlist can do more for cramps than you'd expect.",
+    "Iron-rich snacks (nuts, dried fruit) can help if you're feeling extra drained this week.",
+    "You don't owe anyone full energy today, {name}. Bare minimum is a completely acceptable goal.",
+    "Track your patterns — knowing your own rhythm is the real power move here."
+  ];
+
+  const symptomTips = {
+    cramps: "A heating pad or hot water bottle on your lower belly, plus some gentle stretching, can take the edge off cramps. Rest is genuinely part of the treatment.",
+    fatigue: "Feeling tired today? A little rest, hydration, and something nourishing might help more than pushing through. Nap time is productive time.",
+    headache: "Headaches during your cycle are common — water, a dim quiet room, and a short lie-down can help. If it's severe or won't let up, that's worth mentioning to a doctor.",
+    cravings: "Cravings hitting? Chocolate is basically a certified mood stabilizer today, go for it — your body's just asking for a little extra energy right now.",
+    nausea: "Nausea can happen around your cycle too. Small, bland snacks (crackers, toast) and sipping water slowly usually help more than a big meal.",
+    mood: "Mood swings are so normal here, {name}. Be gentle with yourself — you're not 'too much,' your hormones are just doing a lot of work this week."
+  };
+
+  function personalize(text){
+    return text.replace('{name}', getName() || 'bestie');
+  }
+
+  function randomTip(){
+    return personalize(binnieTips[Math.floor(Math.random()*binnieTips.length)]);
+  }
+
+  let selectedBinnieSymptoms = new Set();
+  document.getElementById('binnieTip').textContent = randomTip();
+  document.getElementById('binnieBtn').addEventListener('click', ()=>{
+    document.querySelectorAll('.binnie-symptom-chip').forEach(c=>c.classList.remove('active'));
+    selectedBinnieSymptoms.clear();
+    document.getElementById('binnieTip').textContent = randomTip();
+  });
+
+  document.querySelectorAll('.binnie-symptom-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      chip.classList.toggle('active');
+      const s = chip.dataset.s;
+      if(selectedBinnieSymptoms.has(s)) selectedBinnieSymptoms.delete(s);
+      else selectedBinnieSymptoms.add(s);
+
+      if(selectedBinnieSymptoms.size){
+        const picked = Array.from(selectedBinnieSymptoms).map(s => personalize(symptomTips[s]));
+        document.getElementById('binnieTip').textContent = picked.join(' ');
+      } else {
+        document.getElementById('binnieTip').textContent = randomTip();
+      }
+    });
+  });
+
+  // ---------------- Day/Night Clinic theme (persisted, time-based default) ----------------
+  const THEME_KEY = 'binnieClinicTheme';
+  function applyTheme(theme){
+    document.body.dataset.theme = theme;
+    document.getElementById('toggleBtn').textContent = theme === 'dark' ? '🌙 Night Clinic' : '☀️ Day Clinic';
+    document.getElementById('nightBanner').classList.toggle('show', theme === 'dark');
+    updateDwaekki();
+  }
+  let savedTheme = localStorage.getItem(THEME_KEY);
+  if(!savedTheme){
+    const hour = new Date().getHours();
+    savedTheme = (hour >= 19 || hour < 6) ? 'dark' : 'light';
+  }
+  applyTheme(savedTheme);
+
+  document.getElementById('toggleBtn').addEventListener('click', ()=>{
+    const isDark = document.body.dataset.theme === 'dark';
+    const newTheme = isDark ? 'light' : 'dark';
+    try{ localStorage.setItem(THEME_KEY, newTheme); }catch(e){}
+    applyTheme(newTheme);
+  });
+
+  // ---------------- Dwaekki personality ----------------
+  function updateDwaekki(){
+    const el = document.getElementById('dwaekkiText');
+    if(!el) return;
+    const isDark = document.body.dataset.theme === 'dark';
+    const hour = new Date().getHours();
+    if(isFirstEverVisit){
+      el.textContent = "STAY!! Welcome to Binnie Clinic! 🐷💗";
+    } else if(isDark){
+      el.textContent = "It's late... go rest, STAY. 😴";
+    } else if(daysSinceLastVisit !== null && daysSinceLastVisit >= 3){
+      el.textContent = "STAY! Long time no see 👀💗";
+    } else if(hour >= 5 && hour < 11){
+      el.textContent = "Good morning, STAY! ☀️🐰 Ready for today?";
+    } else if(!entries.length){
+      el.textContent = "No clinic diary entry yet... 👀";
+    } else {
+      el.textContent = "STAY! You're here!! 🐰";
+    }
+  }
+  function dwaekkiSay(msg, revertMs){
+    const el = document.getElementById('dwaekkiText');
+    if(!el) return;
+    el.textContent = msg;
+    if(revertMs) setTimeout(updateDwaekki, revertMs);
+  }
+
+  // ---------------- welcome check-in ----------------
+  const CHECKIN_KEY = 'binnieClinicCheckin';
+  function todayStr(){ return new Date().toISOString().slice(0,10); }
+  function showCheckinResponse(){
+    const resp = document.getElementById('checkinResponse');
+    resp.style.display = 'block';
+    resp.innerHTML = `<b>Dr. Binnie has noted that.</b> 🩷<br>Be gentle with yourself today, okay?`;
+  }
+  document.querySelectorAll('#checkinMoodGrid .mood-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('#checkinMoodGrid .mood-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      try{ localStorage.setItem(CHECKIN_KEY, JSON.stringify({ date: todayStr(), mood: chip.dataset.mood })); }catch(e){}
+      showCheckinResponse();
+    });
+  });
+  try{
+    const savedCheckin = JSON.parse(localStorage.getItem(CHECKIN_KEY) || 'null');
+    if(savedCheckin && savedCheckin.date === todayStr()){
+      document.querySelectorAll('#checkinMoodGrid .mood-chip').forEach(c=>{
+        if(c.dataset.mood === savedCheckin.mood) c.classList.add('active');
+      });
+      showCheckinResponse();
+    }
+  }catch(e){}
+
+  // ---------------- Smart Reminders ----------------
+  const REMINDER_KEY = 'binnieClinicReminders';
+  const LAST_FIRED_KEY = 'binnieClinicReminderLastFired';
+  const defaultReminders = { period:{on:false, daysBefore:'1'}, selfcare:{on:false, time:'14:00'}, checkin:{on:false, time:'20:00'} };
+  function loadReminders(){
+    try{
+      const raw = JSON.parse(localStorage.getItem(REMINDER_KEY));
+      return raw ? { ...defaultReminders, ...raw } : JSON.parse(JSON.stringify(defaultReminders));
+    }catch(e){ return JSON.parse(JSON.stringify(defaultReminders)); }
+  }
+  function saveReminders(){ try{ localStorage.setItem(REMINDER_KEY, JSON.stringify(reminders)); }catch(e){} }
+  let reminders = loadReminders();
+
+  function notificationsSupported(){ return 'Notification' in window; }
+
+  async function ensureNotificationPermission(){
+    if(!notificationsSupported()) return false;
+    if(Notification.permission === 'granted') return true;
+    if(Notification.permission === 'denied') return false;
+    try{ return (await Notification.requestPermission()) === 'granted'; }
+    catch(e){ return false; }
+  }
+
+  function fireReminderNotification(title, body){
+    if(!notificationsSupported() || Notification.permission !== 'granted') return;
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.getRegistration().then(reg=>{
+        if(reg && reg.showNotification) reg.showNotification(title, { body, icon:'/icon-192.png' });
+        else new Notification(title, { body, icon:'/icon-192.png' });
+      }).catch(()=>{ try{ new Notification(title, { body, icon:'/icon-192.png' }); }catch(e){} });
+    } else {
+      try{ new Notification(title, { body, icon:'/icon-192.png' }); }catch(e){}
+    }
+  }
+
+  // recalculates from live entries every time — never trusts a stale stored date
+  function estimatedNextPeriodDate(){
+    const dated = entries.filter(e=>e.startDate).sort((a,b)=> new Date(b.startDate) - new Date(a.startDate));
+    if(!dated.length) return null;
+    const latest = dated[0];
+    const cLen = parseInt(latest.cycleLength) || 28;
+    const nextDate = new Date(latest.startDate + 'T00:00:00');
+    nextDate.setDate(nextDate.getDate() + cLen);
+    return nextDate;
+  }
+
+  function loadLastFired(){
+    try{ return JSON.parse(localStorage.getItem(LAST_FIRED_KEY) || '{}'); }catch(e){ return {}; }
+  }
+  function saveLastFired(obj){ try{ localStorage.setItem(LAST_FIRED_KEY, JSON.stringify(obj)); }catch(e){} }
+
+  function checkReminders(){
+    if(!notificationsSupported() || Notification.permission !== 'granted') return;
+    const now = new Date();
+    const today = todayStr();
+    const lastFired = loadLastFired();
+
+    if(reminders.period.on){
+      const next = estimatedNextPeriodDate();
+      if(next){
+        const daysBefore = parseInt(reminders.period.daysBefore) || 1;
+        const remindDate = new Date(next);
+        remindDate.setDate(remindDate.getDate() - daysBefore);
+        const key = 'period-' + remindDate.toISOString().slice(0,10);
+        if(remindDate.toDateString() === now.toDateString() && lastFired[key] !== today){
+          fireReminderNotification('🩷 Period reminder', `Your period is estimated around ${next.toLocaleDateString('en-US',{month:'short',day:'numeric'})}. This is an estimate, not a guarantee 💗`);
+          lastFired[key] = today; saveLastFired(lastFired);
+        }
+      }
+    }
+    if(reminders.selfcare.on && reminders.selfcare.time){
+      const [h,m] = reminders.selfcare.time.split(':').map(Number);
+      const key = 'selfcare-' + today;
+      if(now.getHours() === h && now.getMinutes() >= m && now.getMinutes() < m + 2 && lastFired[key] !== today){
+        fireReminderNotification('💧 Self-care reminder', 'A little nudge to pause, hydrate, rest, or take care of yourself. 💗');
+        lastFired[key] = today; saveLastFired(lastFired);
+      }
+    }
+    if(reminders.checkin.on && reminders.checkin.time){
+      const [h,m] = reminders.checkin.time.split(':').map(Number);
+      const key = 'checkin-' + today;
+      if(now.getHours() === h && now.getMinutes() >= m && now.getMinutes() < m + 2 && lastFired[key] !== today){
+        fireReminderNotification('📝 Daily check-in', "A tiny reminder to log how you're feeling today. 🐰");
+        lastFired[key] = today; saveLastFired(lastFired);
+      }
+    }
+  }
+  setInterval(checkReminders, 60000);
+  checkReminders();
+
+  function initReminderUI(){
+    const map = [
+      ['period', 'reminderPeriodToggle', 'reminderPeriodSub'],
+      ['selfcare', 'reminderSelfcareToggle', 'reminderSelfcareSub'],
+      ['checkin', 'reminderCheckinToggle', 'reminderCheckinSub']
+    ];
+    map.forEach(([key, toggleId, subId])=>{
+      const on = !!reminders[key].on;
+      const toggle = document.getElementById(toggleId);
+      toggle.textContent = on ? 'ON' : 'OFF';
+      toggle.classList.toggle('on', on);
+      document.getElementById(subId).style.display = on ? 'flex' : 'none';
+    });
+    document.getElementById('reminderPeriodDays').value = reminders.period.daysBefore || '1';
+    document.getElementById('reminderSelfcareTime').value = reminders.selfcare.time || '14:00';
+    document.getElementById('reminderCheckinTime').value = reminders.checkin.time || '20:00';
+  }
+  initReminderUI();
+
+  async function handleReminderToggle(key){
+    const turningOn = !reminders[key].on;
+    if(turningOn){
+      const granted = await ensureNotificationPermission();
+      if(!granted){
+        showToast(notificationsSupported()
+          ? "🐰 Notifications aren't available here. You can still use Binnie Clinic normally! 💗"
+          : "🐰 Notifications aren't supported on this browser/device. You can still use Binnie Clinic normally! 💗");
+        dwaekkiSay("No worries! I'll stay quiet. 🤐🐰", 4000);
+        return;
+      }
+      reminders[key].on = true;
+      dwaekkiSay("I'll gently remind you when it's time. 🔔💗", 4000);
+    } else {
+      reminders[key].on = false;
+      dwaekkiSay("No worries! I'll stay quiet. 🤐🐰", 4000);
+    }
+    saveReminders();
+    initReminderUI();
+    checkReminders();
+  }
+  document.getElementById('reminderPeriodToggle').addEventListener('click', ()=> handleReminderToggle('period'));
+  document.getElementById('reminderSelfcareToggle').addEventListener('click', ()=> handleReminderToggle('selfcare'));
+  document.getElementById('reminderCheckinToggle').addEventListener('click', ()=> handleReminderToggle('checkin'));
+
+  document.getElementById('reminderPeriodDays').addEventListener('change', e=>{ reminders.period.daysBefore = e.target.value; saveReminders(); });
+  document.getElementById('reminderSelfcareTime').addEventListener('change', e=>{ reminders.selfcare.time = e.target.value; saveReminders(); });
+  document.getElementById('reminderCheckinTime').addEventListener('change', e=>{ reminders.checkin.time = e.target.value; saveReminders(); });
+
+  // help modal
+  const helpOverlay = document.getElementById('helpOverlay');
+  document.getElementById('helpBtn').addEventListener('click', ()=> helpOverlay.classList.add('show'));
+  document.getElementById('closeHelp').addEventListener('click', ()=> helpOverlay.classList.remove('show'));
+  helpOverlay.addEventListener('click', (e)=>{ if(e.target === helpOverlay) helpOverlay.classList.remove('show'); });
+
+  // ---------------- app version ----------------
+  const APP_VERSION = 'v1.9.6';
+  document.getElementById('versionTag').textContent = APP_VERSION;
+  document.getElementById('connectVersionTag').textContent = APP_VERSION;
+
+  // ---------------- connect corners modal ----------------
+  const connectOverlay = document.getElementById('connectOverlay');
+  document.getElementById('connectBtn').addEventListener('click', ()=> connectOverlay.classList.add('show'));
+  document.getElementById('closeConnect').addEventListener('click', ()=> connectOverlay.classList.remove('show'));
+  connectOverlay.addEventListener('click', (e)=>{ if(e.target === connectOverlay) connectOverlay.classList.remove('show'); });
+
+  // ---------------- user's name: greeting + first-visit prompt ----------------
+  function applyGreeting(){
+    const name = getName();
+    const subtitle = document.getElementById('subtitle');
+    subtitle.textContent = name
+      ? `hey ${name} 💗 a lil STAY-coded diary for your cycle · created by Tulika (@minberrydiary)`
+      : `a lil STAY-coded diary for your cycle · created by Tulika (@minberrydiary) 💗`;
+  }
+  applyGreeting();
+
+  const namePromptOverlay = document.getElementById('namePromptOverlay');
+  if(!localStorage.getItem(NAME_KEY + 'Seen')){
+    namePromptOverlay.classList.add('show');
+  }
+  document.getElementById('saveNamePrompt').addEventListener('click', ()=>{
+    const val = document.getElementById('namePromptInput').value;
+    setName(val);
+    try{ localStorage.setItem(NAME_KEY + 'Seen', '1'); }catch(e){}
+    applyGreeting();
+    document.getElementById('nameInput').value = getName();
+    namePromptOverlay.classList.remove('show');
+    document.getElementById('binnieTip').textContent = randomTip();
+    const cleanName = val.trim();
+    showToast(cleanName ? `Hi, ${cleanName}! 👋` : 'Welcome! 👋');
+  });
+
+  // ---------------- privacy: clear my data ----------------
+  const clearDataOverlay = document.getElementById('clearDataOverlay');
+  document.getElementById('openClearData').addEventListener('click', ()=>{
+    settingsOverlay.classList.remove('show');
+    clearDataOverlay.classList.add('show');
+  });
+  document.getElementById('cancelClearData').addEventListener('click', ()=>{
+    clearDataOverlay.classList.remove('show');
+    settingsOverlay.classList.add('show');
+  });
+  clearDataOverlay.addEventListener('click', (e)=>{
+    if(e.target === clearDataOverlay){
+      clearDataOverlay.classList.remove('show');
+    }
+  });
+  document.getElementById('confirmClearData').addEventListener('click', ()=>{
+    const keysToClear = [STORAGE_KEY, NAME_KEY, NAME_KEY + 'Seen', THEME_KEY, CHECKIN_KEY, BG_KEY, REMINDER_KEY, LAST_FIRED_KEY, LAST_VISIT_KEY];
+    keysToClear.forEach(k=>{ try{ localStorage.removeItem(k); }catch(e){} });
+    showToast('Data cleared 🧹');
+    setTimeout(()=> window.location.reload(), 700);
+  });
+
+  // ---------------- settings modal ----------------
+  const settingsOverlay = document.getElementById('settingsOverlay');
+  const nameInput = document.getElementById('nameInput');
+  nameInput.value = getName();
+  document.getElementById('settingsBtn').addEventListener('click', ()=>{
+    nameInput.value = getName();
+    settingsOverlay.classList.add('show');
+  });
+  document.getElementById('closeSettings').addEventListener('click', ()=>{
+    setName(nameInput.value);
+    applyGreeting();
+    settingsOverlay.classList.remove('show');
+  });
+  settingsOverlay.addEventListener('click', (e)=>{
+    if(e.target === settingsOverlay){
+      setName(nameInput.value);
+      applyGreeting();
+      settingsOverlay.classList.remove('show');
+    }
+  });
+
+  // ---------------- background theme picker ----------------
+  const BG_KEY = 'binnieClinicBgTheme';
+  const bgThemeLayer = document.getElementById('bgThemeLayer');
+  const bgImages = {
+    bunny: '/bg-bunny.png',
+    penguin: '/bg-penguin.png',
+    puppy: '/bg-puppy.png',
+    piggy: '/bg-piggy.png'
+  };
+  function applyBgTheme(theme){
+    if(theme && theme !== 'emoji' && bgImages[theme]){
+      bgThemeLayer.style.backgroundImage = `url('${bgImages[theme]}')`;
+      bgThemeLayer.classList.add('show');
+      bgPattern.style.display = 'none';
+    } else {
+      bgThemeLayer.classList.remove('show');
+      bgPattern.style.display = 'block';
+    }
+    document.querySelectorAll('.bg-option').forEach(opt=>{
+      opt.classList.toggle('active', opt.dataset.bg === (theme || 'emoji'));
+    });
+  }
+  const savedBg = localStorage.getItem(BG_KEY) || 'emoji';
+  applyBgTheme(savedBg);
+  document.querySelectorAll('.bg-option').forEach(opt=>{
+    opt.addEventListener('click', ()=>{
+      const theme = opt.dataset.bg;
+      try{ localStorage.setItem(BG_KEY, theme); }catch(e){}
+      applyBgTheme(theme);
+    });
+  });
+
+  // mood chips (Log Today form only — checkin mood grid is wired separately above)
+  document.querySelectorAll('#moodGrid .mood-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('#moodGrid .mood-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      selectedMood = chip.dataset.mood;
+    });
+  });
+
+  // symptom chips
+  document.querySelectorAll('.symptom-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      chip.classList.toggle('active');
+      const s = chip.dataset.symptom;
+      if(selectedSymptoms.has(s)) selectedSymptoms.delete(s);
+      else selectedSymptoms.add(s);
+    });
+  });
+
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.innerHTML = msg;
+    t.classList.add('show');
+    setTimeout(()=> t.classList.remove('show'), 2800);
+  }
+
+  function updateStats(){
+    document.getElementById('statStreak').textContent = entries.length;
+
+    const cycleLens = entries.map(e=>parseInt(e.cycleLength)).filter(n=>!isNaN(n));
+    const avg = cycleLens.length ? Math.round(cycleLens.reduce((a,b)=>a+b,0)/cycleLens.length) : null;
+    document.getElementById('statAvgCycle').textContent = avg ?? '–';
+
+    const periodLens = entries.map(e=>parseInt(e.periodLength)).filter(n=>!isNaN(n));
+    const avgPeriod = periodLens.length ? Math.round(periodLens.reduce((a,b)=>a+b,0)/periodLens.length) : null;
+
+    const moodCounts = {};
+    entries.forEach(e=>{ if(e.mood) moodCounts[e.mood] = (moodCounts[e.mood]||0)+1; });
+    const topMood = Object.keys(moodCounts).sort((a,b)=>moodCounts[b]-moodCounts[a])[0];
+    document.getElementById('statTopMood').textContent = topMood ? topMood.split(' ')[0] : '–';
+
+    const dated = entries.filter(e=>e.startDate).sort((a,b)=> new Date(b.startDate) - new Date(a.startDate));
+
+    // ---- cycle overview ----
+    let currentDay = null;
+    if(dated.length){
+      const start = new Date(dated[0].startDate + 'T00:00:00');
+      const today = new Date();
+      const diffDays = Math.floor((today - start) / 86400000) + 1;
+      if(diffDays > 0) currentDay = diffDays;
+    }
+    const overviewEl = document.getElementById('cycleOverview');
+    overviewEl.innerHTML =
+      (currentDay ? `📅 Current cycle: <b>Day ${currentDay}</b><br>` : '') +
+      `🔁 Average cycle: <b>${avg ?? '–'} days</b><br>` +
+      `🩸 Average period: <b>${avgPeriod ?? '–'} days</b><br>` +
+      `📋 Entries: <b>${entries.length}</b>`;
+
+    // ---- visual timeline ----
+    document.querySelectorAll('.cycle-timeline .stage').forEach(s=>s.classList.remove('active'));
+    if(currentDay && dated.length){
+      const pLen = parseInt(dated[0].periodLength) || 5;
+      const cLen = parseInt(dated[0].cycleLength) || 28;
+      let stage = 'luteal';
+      if(currentDay <= pLen) stage = 'period';
+      else if(currentDay <= Math.round(cLen*0.45)) stage = 'follicular';
+      else if(currentDay <= Math.round(cLen*0.6)) stage = 'fertile';
+      const activeEl = document.querySelector(`.cycle-timeline .stage[data-stage="${stage}"]`);
+      if(activeEl) activeEl.classList.add('active');
+    }
+
+    // ---- prediction banner ----
+    const banner = document.getElementById('predictBanner');
+    if(dated.length){
+      const latest = dated[0];
+      const cLen = parseInt(latest.cycleLength) || 28;
+      const nextDate = new Date(latest.startDate + 'T00:00:00');
+      nextDate.setDate(nextDate.getDate() + cLen);
+      const opts = { month:'short', day:'numeric' };
+      banner.innerHTML = `<b>🔮 Estimated next period:</b> ${nextDate.toLocaleDateString('en-US', opts)}<span class="predict-disclaimer">Predictions are estimates and may not always be accurate.</span>`;
+    } else {
+      banner.textContent = "Log a couple entries and I'll start predicting your next cycle 🔮";
+    }
+
+    updateDwaekki();
+  }
+
+  let editingId = null;
+
+  function formatDateLong(dateStr){
+    if(!dateStr) return 'No date';
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+  }
+
+  function renderEntries(){
+    const list = document.getElementById('entriesList');
+    if(!entries.length){
+      list.innerHTML = '<div class="empty">No entries yet — save your first one above 🍓</div>';
+      return;
+    }
+    list.innerHTML = entries.slice().reverse().map(e=>{
+      const tags = e.symptoms.length ? e.symptoms.map(s=>`<span class="tag">${s}</span>`).join('') : '';
+      return `<div class="diary-date">${formatDateLong(e.startDate)}</div>
+        <div class="diary-entry">
+          🌸 Mood: ${e.mood || 'Not set'}<br>
+          🩷 Symptoms: ${e.symptoms.length ? e.symptoms.join(' · ') : 'None logged'}<br>
+          📝 Notes: ${e.notes || 'No notes'}
+          ${tags ? `<div class="tags">${tags}</div>` : ''}
+          <div class="diary-actions">
+            <button class="edit-entry" data-id="${e.id}" type="button">Edit ✏️</button>
+            <button class="delete-entry" data-id="${e.id}" type="button">Delete 🗑️</button>
+          </div>
+        </div>`;
+    }).join('');
+
+    list.querySelectorAll('.delete-entry').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const id = btn.dataset.id;
+        if(!confirm('Delete this entry? This can\'t be undone.')) return;
+        entries = entries.filter(e => String(e.id) !== id);
+        saveEntries();
+        updateStats();
+        renderEntries();
+        showToast('Entry deleted 🗑️');
+      });
+    });
+
+    list.querySelectorAll('.edit-entry').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const id = btn.dataset.id;
+        const entry = entries.find(e => String(e.id) === id);
+        if(!entry) return;
+        editingId = id;
+        document.getElementById('startDate').value = entry.startDate || '';
+        document.getElementById('periodLength').value = entry.periodLength || '';
+        document.getElementById('cycleLength').value = entry.cycleLength || '28';
+        document.getElementById('notes').value = entry.notes || '';
+        document.querySelectorAll('#moodGrid .mood-chip').forEach(c=>{
+          c.classList.toggle('active', c.dataset.mood === entry.mood);
+        });
+        selectedMood = entry.mood;
+        selectedSymptoms = new Set(entry.symptoms || []);
+        document.querySelectorAll('#symptomGrid .symptom-chip').forEach(c=>{
+          c.classList.toggle('active', selectedSymptoms.has(c.dataset.symptom));
+        });
+        document.getElementById('saveBtn').textContent = '💾 Update Entry';
+        document.getElementById('entriesCard').style.display = 'none';
+        document.getElementById('startDate').closest('.card').scrollIntoView({ behavior:'smooth' });
+      });
+    });
+  }
+
+  document.getElementById('saveBtn').addEventListener('click', ()=>{
+    const entryData = {
+      startDate: document.getElementById('startDate').value,
+      periodLength: document.getElementById('periodLength').value,
+      cycleLength: document.getElementById('cycleLength').value || '28',
+      mood: selectedMood,
+      symptoms: Array.from(selectedSymptoms),
+      notes: document.getElementById('notes').value
+    };
+
+    if(editingId){
+      const idx = entries.findIndex(e => String(e.id) === editingId);
+      if(idx > -1) entries[idx] = { ...entries[idx], ...entryData };
+      editingId = null;
+      document.getElementById('saveBtn').textContent = '💾 Save Entry';
+      showToast('💗 Entry updated!');
+    } else {
+      entries.push({ id: Date.now() + '-' + Math.random().toString(36).slice(2,8), ...entryData });
+      showToast('💗 Entry tucked safely into your clinic diary!<br><span style="font-weight:400; font-size:.78rem;">Binnie has added today\'s note to your records. 🐰📋</span>');
+    }
+
+    saveEntries();
+    updateStats();
+    dwaekkiSay('Entry saved! Good job taking a moment for yourself. 💗', 4000);
+
+    document.getElementById('startDate').value='';
+    document.getElementById('periodLength').value='';
+    document.getElementById('notes').value='';
+    document.querySelectorAll('#moodGrid .mood-chip').forEach(c=>c.classList.remove('active'));
+    document.querySelectorAll('#symptomGrid .symptom-chip').forEach(c=>c.classList.remove('active'));
+    selectedMood = null;
+    selectedSymptoms.clear();
+
+    document.getElementById('entriesCard').style.display = 'block';
+    renderEntries();
+  });
+
+  document.getElementById('viewBtn').addEventListener('click', ()=>{
+    const card = document.getElementById('entriesCard');
+    const isHidden = card.style.display === 'none';
+    card.style.display = isHidden ? 'block' : 'none';
+    if(isHidden) renderEntries();
+  });
+
+  updateStats();
+
+  // ---------------- Ship Match mini game ----------------
+  const members = [
+    { id:'chan',      name:'Chan',      emoji:'🐺' },
+    { id:'in',        name:'I.N',       emoji:'🦊' },
+    { id:'leeknow',   name:'Lee Know',  emoji:'🐰' },
+    { id:'han',       name:'Han',       emoji:'🐿️' },
+    { id:'changbin',  name:'Changbin',  emoji:'🐰🐷' },
+    { id:'seungmin',  name:'Seungmin',  emoji:'🐶' },
+    { id:'hyunjin',   name:'Hyunjin',   emoji:'🥟' },
+    { id:'felix',     name:'Felix',     emoji:'🐥' },
+  ];
+  const ships = [
+    ['chan','in'], ['leeknow','han'], ['changbin','seungmin'], ['hyunjin','felix']
+  ];
+  function isShip(a, b){
+    return ships.some(pair => (pair[0]===a && pair[1]===b) || (pair[0]===b && pair[1]===a));
+  }
+
+  const arena = document.getElementById('shipArena');
+  let bubbleState = {}; // id -> {x,y,matchedWith}
+
+  function randomPositions(){
+    const w = arena.clientWidth, h = arena.clientHeight;
+    const bw = 64;
+    members.forEach(m=>{
+      bubbleState[m.id] = {
+        x: Math.random() * (w - bw - 20) + 10,
+        y: Math.random() * (h - bw - 20) + 10,
+        matchedWith: null
+      };
+    });
+  }
+
+  function renderBubbles(){
+    arena.querySelectorAll('.ship-bubble').forEach(b=>b.remove());
+    members.forEach(m=>{
+      const state = bubbleState[m.id];
+      const el = document.createElement('div');
+      el.className = 'ship-bubble';
+      el.dataset.id = m.id;
+      el.style.left = state.x + 'px';
+      el.style.top = state.y + 'px';
+      el.style.animationDelay = (Math.random()*2) + 's';
+      el.innerHTML = `${m.emoji}<span class="name">${m.name}</span>`;
+      if(state.matchedWith) el.classList.add('matched');
+      arena.appendChild(el);
+      attachDrag(el, m.id);
+    });
+  }
+
+  function attachDrag(el, id){
+    let dragging = false, offsetX = 0, offsetY = 0;
+
+    function pointerDown(e){
+      dragging = true;
+      el.classList.add('dragging');
+      const rect = el.getBoundingClientRect();
+      const arenaRect = arena.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      offsetX = clientX - rect.left;
+      offsetY = clientY - rect.top;
+      e.preventDefault();
+    }
+
+    function pointerMove(e){
+      if(!dragging) return;
+      const arenaRect = arena.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      let x = clientX - arenaRect.left - offsetX;
+      let y = clientY - arenaRect.top - offsetY;
+      x = Math.max(0, Math.min(arenaRect.width - 64, x));
+      y = Math.max(0, Math.min(arenaRect.height - 64, y));
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      bubbleState[id].x = x;
+      bubbleState[id].y = y;
+    }
+
+    function pointerUp(){
+      if(!dragging) return;
+      dragging = false;
+      el.classList.remove('dragging');
+      checkProximity(id);
+    }
+
+    el.addEventListener('mousedown', pointerDown);
+    el.addEventListener('touchstart', pointerDown, { passive:false });
+    window.addEventListener('mousemove', pointerMove);
+    window.addEventListener('touchmove', pointerMove, { passive:false });
+    window.addEventListener('mouseup', pointerUp);
+    window.addEventListener('touchend', pointerUp);
+  }
+
+  function checkProximity(id){
+    const a = bubbleState[id];
+    let closestId = null, closestDist = Infinity;
+    members.forEach(m=>{
+      if(m.id === id) return;
+      const b = bubbleState[m.id];
+      const dx = (a.x) - (b.x), dy = (a.y) - (b.y);
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if(dist < closestDist){ closestDist = dist; closestId = m.id; }
+    });
+    if(closestId && closestDist < 70){
+      if(isShip(id, closestId)){
+        attractPair(id, closestId);
+      } else {
+        repelPair(id, closestId);
+      }
+    }
+  }
+
+  function attractPair(idA, idB){
+    const a = bubbleState[idA], b = bubbleState[idB];
+    const midX = (a.x + b.x) / 2, midY = (a.y + b.y) / 2;
+    a.x = midX - 34; a.y = midY;
+    b.x = midX + 34; b.y = midY;
+    a.matchedWith = idB; b.matchedWith = idA;
+
+    const elA = arena.querySelector(`[data-id="${idA}"]`);
+    const elB = arena.querySelector(`[data-id="${idB}"]`);
+    if(elA){ elA.style.left = a.x+'px'; elA.style.top = a.y+'px'; elA.classList.add('matched'); }
+    if(elB){ elB.style.left = b.x+'px'; elB.style.top = b.y+'px'; elB.classList.add('matched'); }
+
+    const heart = document.createElement('div');
+    heart.className = 'heart-pop';
+    heart.textContent = '💗';
+    heart.style.left = (midX + 14) + 'px';
+    heart.style.top = (midY - 10) + 'px';
+    arena.appendChild(heart);
+    setTimeout(()=> heart.remove(), 1000);
+  }
+
+  function repelPair(idA, idB){
+    const a = bubbleState[idA], b = bubbleState[idB];
+    const arenaRect = arena.getBoundingClientRect();
+    let dx = a.x - b.x, dy = a.y - b.y;
+    const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+    dx /= dist; dy /= dist;
+    a.x = Math.max(0, Math.min(arenaRect.width - 64, a.x + dx*90));
+    a.y = Math.max(0, Math.min(arenaRect.height - 64, a.y + dy*90));
+
+    const elA = arena.querySelector(`[data-id="${idA}"]`);
+    if(elA){
+      elA.style.left = a.x+'px'; elA.style.top = a.y+'px';
+      elA.classList.add('shake');
+      setTimeout(()=> elA.classList.remove('shake'), 450);
+    }
+  }
+
+  document.getElementById('shipReset').addEventListener('click', ()=>{
+    randomPositions();
+    renderBubbles();
+  });
+
+  randomPositions();
+  renderBubbles();
+  window.addEventListener('resize', ()=>{ randomPositions(); renderBubbles(); });
+
+  // register service worker so the site can be installed as an app,
+  // and watch for updates so we can show the cute "Update now" banner
+  if('serviceWorker' in navigator){
+    const updateBanner = document.getElementById('updateBanner');
+    const updateNowBtn = document.getElementById('updateNowBtn');
+    let waitingWorker = null;
+
+    function showUpdateBanner(worker){
+      waitingWorker = worker;
+      updateBanner.classList.add('show');
+    }
+
+    updateNowBtn.addEventListener('click', ()=>{
+      if(waitingWorker) waitingWorker.postMessage('SKIP_WAITING');
+      updateBanner.classList.remove('show');
+    });
+
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', ()=>{
+      if(refreshing) return;
+      refreshing = true;
+      window.location.reload();
+    });
+
+    window.addEventListener('load', ()=>{
+      navigator.serviceWorker.register('/sw.js').then(reg=>{
+        // a worker was already waiting when we loaded (e.g. update happened in another tab)
+        if(reg.waiting && navigator.serviceWorker.controller){
+          showUpdateBanner(reg.waiting);
+        }
+        reg.addEventListener('updatefound', ()=>{
+          const newWorker = reg.installing;
+          if(!newWorker) return;
+          newWorker.addEventListener('statechange', ()=>{
+            if(newWorker.state === 'installed' && navigator.serviceWorker.controller){
+              showUpdateBanner(newWorker);
+            }
+          });
+        });
+        // check for a new version every so often for anyone who keeps a tab open forever
+        setInterval(()=> reg.update().catch(()=>{}), 60 * 60 * 1000);
+      }).catch(()=>{});
+    });
+  }
+
+  // ================= INSTALL BINNIE CLINIC =================
+  (function(){
+    const installCard = document.getElementById('installCard');
+    const installBtn = document.getElementById('installActionBtn');
+    const iosOverlay = document.getElementById('iosInstallOverlay');
+    let deferredPrompt = null;
+
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    const ua = window.navigator.userAgent || '';
+    const isIos = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+
+    if(isStandalone){
+      installCard.style.display = 'none';
+    } else if(isIos){
+      installCard.style.display = 'flex';
+      installBtn.addEventListener('click', ()=> iosOverlay.classList.add('show'));
+    } else {
+      // Android/desktop Chromium: wait for the native prompt signal before showing anything
+      window.addEventListener('beforeinstallprompt', (e)=>{
+        e.preventDefault();
+        deferredPrompt = e;
+        installCard.style.display = 'flex';
+      });
+      installBtn.addEventListener('click', async ()=>{
+        if(!deferredPrompt) return;
+        deferredPrompt.prompt();
+        try{ await deferredPrompt.userChoice; }catch(e){}
+        deferredPrompt = null;
+        installCard.style.display = 'none';
+      });
+    }
+
+    window.addEventListener('appinstalled', ()=>{ installCard.style.display = 'none'; });
+
+    document.getElementById('closeIosInstall').addEventListener('click', ()=> iosOverlay.classList.remove('show'));
+    iosOverlay.addEventListener('click', (e)=>{ if(e.target === iosOverlay) iosOverlay.classList.remove('show'); });
+
+    document.getElementById('stayIdTeaserBtn').addEventListener('click', ()=>{
+      document.getElementById('stayIdSection').scrollIntoView({ behavior:'smooth', block:'start' });
+    });
+  })();
+
+  // ================= STAY ID CARD =================
+  (function(){
+    const nameInput = document.getElementById('stayIdName');
+    const photoInput = document.getElementById('stayIdPhoto');
+
+    const cardName = document.getElementById('stayIdCardName');
+    const cardDate = document.getElementById('stayIdCardDate');
+    const cardCode = document.getElementById('stayIdCardCode');
+    const photoBox = document.getElementById('stayIdPhotoBox');
+
+    const frontEl = document.getElementById('stayIdFront');
+
+    function generateID(){
+      return 'BC-STAY-' + Math.floor(1000 + Math.random() * 9000);
+    }
+    cardCode.textContent = generateID();
+
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    cardDate.textContent = `${dd}/${mm}/${today.getFullYear()}`;
+
+    nameInput.addEventListener('input', ()=>{
+      const v = nameInput.value.trim();
+      cardName.textContent = v.toUpperCase() || 'YOUR NAME';
+      cardName.classList.toggle('filled', !!v);
+    });
+
+    // ---------- photo upload + crop ----------
+    const cropOverlay = document.getElementById('stayIdCropOverlay');
+    const cropImg = document.getElementById('stayIdCropImg');
+    const cropConfirmBtn = document.getElementById('stayIdCropConfirm');
+    const cropCancelBtn = document.getElementById('stayIdCropCancel');
+    let cropper = null;
+
+    function closeCropModal(){
+      cropOverlay.classList.remove('show');
+      if(cropper){ cropper.destroy(); cropper = null; }
+      cropImg.removeAttribute('src');
+    }
+
+    photoInput.addEventListener('change', ()=>{
+      const file = photoInput.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = (event)=>{
+        cropImg.src = event.target.result;
+        cropOverlay.classList.add('show');
+        cropImg.onload = ()=>{
+          if(typeof Cropper === 'undefined'){
+            // cropper library still loading — just use the photo as-is
+            photoBox.innerHTML = `<img src="${event.target.result}" alt="Your photo">`;
+            closeCropModal();
+            return;
+          }
+          if(cropper) cropper.destroy();
+          const boxRect = photoBox.getBoundingClientRect();
+          const aspect = (boxRect.width && boxRect.height) ? (boxRect.width / boxRect.height) : (3/4);
+          cropper = new Cropper(cropImg, {
+            aspectRatio: aspect,
+            viewMode: 1,
+            dragMode: 'move',
+            autoCropArea: 1,
+            background: false,
+            guides: false,
+            highlight: false,
+            center: false,
+            cropBoxMovable: false,
+            cropBoxResizable: false,
+            toggleDragModeOnDblclick: false,
+          });
+        };
+      };
+      reader.readAsDataURL(file);
+    });
+
+    cropConfirmBtn.addEventListener('click', ()=>{
+      if(!cropper) return;
+      const canvas = cropper.getCroppedCanvas({ width: 640, imageSmoothingQuality: 'high' });
+      const dataUrl = canvas.toDataURL('image/png');
+      photoBox.innerHTML = `<img src="${dataUrl}" alt="Your photo">`;
+      closeCropModal();
+    });
+
+    cropCancelBtn.addEventListener('click', ()=>{
+      if(!photoBox.querySelector('img')){ photoInput.value = ''; }
+      closeCropModal();
+    });
+
+    cropOverlay.addEventListener('click', (e)=>{
+      if(e.target === cropOverlay) cropCancelBtn.click();
+    });
+
+    document.getElementById('stayIdResetBtn').addEventListener('click', ()=>{
+      nameInput.value = '';
+      photoInput.value = '';
+      cardName.textContent = 'YOUR NAME';
+      cardName.classList.remove('filled');
+      cardDate.textContent = `${dd}/${mm}/${today.getFullYear()}`;
+      photoBox.innerHTML = '<span class="stayid-photo-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2.5"/><path d="M8 7l1.6-2.6h4.8L16 7"/><circle cx="12" cy="14" r="4"/></svg><br>YOUR PHOTO HERE</span>';
+      cardCode.textContent = generateID();
+      showToast('Reset ✨');
+    });
+
+    // the on-screen card uses CSS container-query units (cqw) so it scales
+    // nicely at any width. But html-to-image clones the card in isolation to
+    // rasterize it, and that clone doesn't reliably carry the container
+    // context with it — which is why the exported PNG was coming out with
+    // wildly oversized/misplaced text. Fix: right before capture, compute
+    // exactly what each cqw value resolves to at the card's *actual current*
+    // pixel width, and bake that in as a plain inline px value (no cqw left
+    // for the export step to misinterpret). Restored right after.
+    const STAYID_CQW_MAP = [
+      ['.stayid-logo-pill', 'fontSize', 2.15],
+      ['.stayid-bunny', 'width', 7.5],
+      ['.stayid-photo-placeholder', 'fontSize', 2.1],
+      ['.stayid-photo-placeholder svg', 'width', 5.2],
+      ['.stayid-ribbon', 'fontSize', 2.1],
+      ['.stayid-heading', 'fontSize', 7.4],
+      ['.stayid-startrail', 'width', 15],
+      ['.stayid-subheading', 'fontSize', 2.1],
+      ['.stayid-field-label', 'fontSize', 2.1],
+      ['.stayid-field-box', 'fontSize', 2.9],
+      ['.stayid-static', 'fontSize', 2.9],
+      ['.stayid-stamp', 'fontSize', 1.6],
+      ['.stayid-stamp svg', 'width', 3.2],
+      ['.stayid-holo-wrap', 'width', 9.5],
+      ['.stayid-idcode', 'fontSize', 2.3],
+    ];
+    function lockCqwSizing(cardEl){
+      const widthPx = cardEl.getBoundingClientRect().width;
+      const unit = widthPx / 100;
+      const restores = [];
+      STAYID_CQW_MAP.forEach(([sel, prop, val])=>{
+        cardEl.querySelectorAll(sel).forEach(node=>{
+          restores.push([node, prop, node.style[prop]]);
+          node.style[prop] = (val * unit) + 'px';
+        });
+      });
+      return function unlock(){
+        restores.forEach(([node, prop, old])=>{ node.style[prop] = old; });
+      };
+    }
+
+    // capture one face at its exact on-screen size, so nothing can silently
+    // reflow or expand past the card's visible edge in the exported image
+    async function captureFace(el){
+      if(document.fonts && document.fonts.ready){ try{ await document.fonts.ready; }catch(e){} }
+      const prevDisplay = el.style.display;
+      const prevWidth = el.style.width;
+      const prevHeight = el.style.height;
+      el.style.display = 'flex';
+      const rect = el.getBoundingClientRect();
+      el.style.width = rect.width + 'px';
+      el.style.height = rect.height + 'px';
+      const unlock = lockCqwSizing(el);
+      try{
+        return await htmlToImage.toCanvas(el, { pixelRatio: 3, backgroundColor: null, cacheBust: true });
+      } finally {
+        unlock();
+        el.style.display = prevDisplay;
+        el.style.width = prevWidth;
+        el.style.height = prevHeight;
+      }
+    }
+
+    function downloadCanvas(canvas, filename){
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    document.getElementById('stayIdSaveBtn').addEventListener('click', async ()=>{
+      if(typeof htmlToImage === 'undefined'){
+        showToast("🐰 Still loading — give it a sec and try again!");
+        return;
+      }
+      try{
+        const frontCanvas = await captureFace(frontEl);
+        downloadCanvas(frontCanvas, 'binnie-clinic-stay-id.png');
+        showToast('Saved! Ready to share 🐰💗');
+      }catch(e){
+        showToast("🐰 Couldn't save that — try again?");
+      }
+    });
+
+    document.getElementById('stayIdShareBtn').addEventListener('click', async ()=>{
+      if(typeof htmlToImage === 'undefined'){
+        showToast("🐰 Still loading — give it a sec and try again!");
+        return;
+      }
+      let frontCanvas;
+      try{
+        frontCanvas = await captureFace(frontEl);
+      }catch(e){
+        showToast("🐰 Couldn't put that together — try again?");
+        return;
+      }
+
+      frontCanvas.toBlob(async (blob)=>{
+        if(!blob) return;
+        const file = new File([blob], 'binnie-clinic-stay-id.png', { type: 'image/png' });
+        if(navigator.canShare && navigator.canShare({ files: [file] })){
+          try{
+            await navigator.share({ files: [file], title: 'My Binnie Clinic STAY ID', text: 'Made my STAY ID on Binnie Clinic! 🐰💗' });
+            return;
+          }catch(e){ /* cancelled — fall through to download */ }
+        }
+        downloadCanvas(frontCanvas, 'binnie-clinic-stay-id.png');
+        showToast('Saved! Now upload it to Insta/TikTok/YouTube from your gallery 🐰💗');
+      }, 'image/png');
+    });
+  })();
+</script>
+</body>
+</html>
