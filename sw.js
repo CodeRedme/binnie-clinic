@@ -1,6 +1,6 @@
 // Bump this on every deploy so the browser knows a new version exists.
 // Old caches (anything not matching CACHE_NAME) get wiped in 'activate' below.
-const CACHE_NAME = 'binnie-clinic-v19';
+const CACHE_NAME = 'binnie-clinic-v20';
 
 const STATIC_ASSETS = [
   '/icon-192.png',
@@ -12,8 +12,7 @@ const STATIC_ASSETS = [
   '/bg-puppy.png',
   '/bg-piggy.png',
   '/stayid-card-preview.png',
-  '/stayid-lace-top.png',
-  '/stayid-lace-bottom.png'
+  '/stayid-card-bg.png'
 ];
 
 self.addEventListener('install', (event) => {

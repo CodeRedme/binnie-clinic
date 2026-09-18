@@ -454,65 +454,39 @@
   #stayIdCropConfirm, #stayIdCropCancel{ flex:1; }
 
   .stayid-card{
-    position:relative; width:100%; max-width:480px; aspect-ratio:1.58/1;
-    border-radius:18px; overflow:hidden; font-family:'Fredoka', sans-serif;
+    position:relative; width:100%; max-width:520px; aspect-ratio:1659/948;
+    border-radius:16px; overflow:hidden; font-family:'Fredoka', sans-serif;
     box-shadow:0 10px 26px rgba(0,0,0,.18);
+    background-image:url('/stayid-card-bg.png'); background-size:cover; background-position:center;
   }
 
-  /* --- front --- */
-  .stayid-front{ background:#FF97CB; display:flex; color:#7A2E52; }
-  .stayid-lace{ position:absolute; left:0; right:0; height:11%; z-index:3;
-    background-image:url('/stayid-lace-top.png'); background-repeat:repeat-x; background-size:auto 100%;
-    pointer-events:none;
+  /* --- front: everything decorative is baked into the background image now —
+     these are just the live overlays that sit on top of it --- */
+  .stayid-photo-overlay{
+    position:absolute; left:3.2%; top:13.5%; width:24.3%; height:45.5%;
+    border-radius:6px; overflow:hidden;
   }
-  .stayid-lace.bottom{ top:auto; bottom:0; background-image:url('/stayid-lace-bottom.png'); }
-  .stayid-lace.top{ top:0; }
-  .stayid-star-topright{ position:absolute; top:12.5%; right:4.5%; width:6.5%; z-index:2; }
-  .stayid-left{ width:36%; padding:13% 3% 12%; display:flex; flex-direction:column; gap:3%; position:relative; z-index:1; }
-  .stayid-photo{
-    flex:1; background:#8F8F93; border:2px solid #E8226F; border-radius:8px;
-    display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; min-height:36px;
+  .stayid-photo-overlay img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .stayid-name-overlay{
+    position:absolute; left:34.5%; top:46.5%; width:59%; height:7.5%;
+    display:flex; align-items:center; padding:0 1%;
+    font-family:'Baloo 2', sans-serif; font-weight:700; color:#5C3A4A;
+    text-transform:uppercase; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+    font-size:13px; font-size:3.6cqw;
   }
-  .stayid-photo img{ width:100%; height:100%; object-fit:cover; }
-  .stayid-photo-placeholder{ color:#fff; font-weight:700; text-align:center; line-height:1.5;
-    font-size:7px; font-size:2.3cqw; }
-  .stayid-ribbon{
-    background:#F0559C; color:#fff; font-family:'Baloo 2',sans-serif; font-weight:700;
-    text-align:center; padding:4% 0; border-radius:4px; font-size:7px; font-size:2.3cqw; flex:none;
+  .stayid-patch{ position:absolute; background:#FCD8EA; }
+  .stayid-date-overlay{
+    position:absolute; left:36.5%; top:76.5%; width:19%; height:8%;
+    display:flex; align-items:center;
+    font-family:'Fredoka', sans-serif; font-weight:600; color:#7A2E52;
+    font-size:11px; font-size:3cqw;
   }
-  .stayid-barcode{
-    height:8%; flex:none; background:repeating-linear-gradient(90deg, #1a1a1a 0 1px, transparent 1px 2px, #1a1a1a 2px 3px, transparent 3px 3.6px, #1a1a1a 3.6px 5px, transparent 5px 5.6px);
+  .stayid-code-overlay{
+    position:absolute; left:67.5%; top:79.5%; width:17%; height:6%;
+    display:flex; align-items:center;
+    font-family:'Courier New', monospace; font-weight:700; color:#7A2E52; letter-spacing:.5px;
+    font-size:10px; font-size:2.7cqw;
   }
-  .stayid-divider{ width:2px; background:repeating-linear-gradient(180deg, #E8226F 0 6px, transparent 6px 12px); opacity:.5; }
-  .stayid-right{ flex:1; padding:13% 3.5% 12%; position:relative; z-index:1; display:flex; flex-direction:column; }
-  .stayid-heading{ font-family:'Baloo 2',sans-serif; font-weight:800; color:#E8226F; line-height:1; letter-spacing:.5px;
-    font-size:18px; font-size:6cqw;
-  }
-  .stayid-subheading{ font-weight:700; color:#E8226F; letter-spacing:.5px; opacity:.9;
-    font-size:6px; font-size:2cqw; }
-  .stayid-hr{ display:flex; align-items:center; gap:4px; margin:1.5% 0 2%; flex:none; }
-  .stayid-hr::before{ content:''; flex:1; height:1.5px; background:#E8226F; opacity:.55; }
-  .stayid-hr-accent{ width:10%; aspect-ratio:2.4; flex:none;
-    background: repeating-linear-gradient(-45deg, #E8226F 0 15%, transparent 15% 30%);
-    opacity:.75;
-  }
-  .stayid-field-label{ font-family:'Playfair Display', serif; font-weight:700; color:#E8226F; margin-top:1.5%;
-    font-size:6.5px; font-size:2.1cqw; flex:none; }
-  .stayid-field-box{
-    border:1.5px solid #B85A82; border-radius:4px; padding:1% 3%; font-weight:700; color:#5C3A4A;
-    background:rgba(255,255,255,.45); flex:none;
-    text-transform:uppercase; margin-top:.5%; min-height:12px; font-size:9px; font-size:2.7cqw;
-    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  }
-  .stayid-static{ font-family:'Playfair Display', serif; font-weight:700; color:#5C3A4A; text-transform:uppercase;
-    font-size:9px; font-size:2.7cqw; flex:none; }
-  .stayid-bottom-row{ display:flex; align-items:flex-end; justify-content:space-between; margin-top:auto; padding-top:1.5%; gap:6px; flex:none; }
-  .stayid-idcode{ font-family:'Courier New',monospace; color:#E8226F; letter-spacing:.5px; opacity:.85;
-    font-size:6.5px; font-size:2.1cqw; }
-  .stayid-wordmark{ font-family:'Playfair Display', serif; font-weight:700; color:#E8226F; text-align:right;
-    line-height:1.05; font-size:8.5px; font-size:2.8cqw;
-  }
-
 </style>
 </head>
 <body data-theme="light">
@@ -697,34 +671,12 @@
       <div class="stayid-card-stage">
         <!-- FRONT -->
         <div class="stayid-card stayid-front" id="stayIdFront">
-          <div class="stayid-lace top"></div>
-          <div class="stayid-lace bottom"></div>
-          <svg class="stayid-star-topright" viewBox="0 0 40 40" aria-hidden="true">
-            <polygon points="20,3 24,15 37,15 26,23 30,35 20,27 10,35 14,23 3,15 16,15" fill="none" stroke="#fff" stroke-width="2"/>
-          </svg>
-          <div class="stayid-left">
-            <div class="stayid-photo" id="stayIdPhotoBox">
-              <span class="stayid-photo-placeholder">📷<br>YOUR PHOTO<br>HERE</span>
-            </div>
-            <div class="stayid-ribbon">★ BINNIE CLINIC</div>
-            <div class="stayid-barcode"></div>
-          </div>
-          <div class="stayid-divider"></div>
-          <div class="stayid-right">
-            <div class="stayid-heading">STAYID</div>
-            <div class="stayid-subheading">BINNIE CLINIC • STAY IDENTIFICATION</div>
-            <div class="stayid-hr"><div class="stayid-hr-accent"></div></div>
-            <div class="stayid-field-label">NAME</div>
-            <div class="stayid-field-box" id="stayIdCardName">YOUR NAME</div>
-            <div class="stayid-field-label">OCCUPANCY</div>
-            <div class="stayid-static">STAY</div>
-            <div class="stayid-field-label">DATE OF ISSUE</div>
-            <div class="stayid-static" id="stayIdCardDate">DD/MM/YYYY</div>
-            <div class="stayid-bottom-row">
-              <div class="stayid-idcode" id="stayIdCardCode">BC-STAY-XXXX</div>
-              <div class="stayid-wordmark">BINNIE<br>CLINIC</div>
-            </div>
-          </div>
+          <div class="stayid-photo-overlay" id="stayIdPhotoBox"></div>
+          <div class="stayid-name-overlay" id="stayIdCardName"></div>
+          <div class="stayid-patch" style="left:36%; top:76%; width:20%; height:9%;"></div>
+          <div class="stayid-date-overlay" id="stayIdCardDate">DD/MM/YYYY</div>
+          <div class="stayid-patch" style="left:66.5%; top:79%; width:18.5%; height:7%;"></div>
+          <div class="stayid-code-overlay" id="stayIdCardCode">BC-STAY-XXXX</div>
         </div>
       </div>
     </div>
@@ -899,7 +851,11 @@
       <div class="connect-card-title">🐰 Binnie Corner</div>
       <p class="connect-text"><b>Binnie Clinic <span id="connectVersionTag"></span></b></p>
       <div class="connect-changelog">
-        <b>✨ What's new — v1.9.7</b>
+        <b>✨ What's new — v1.9.8</b>
+        <ul>
+          <li>💗 STAY ID card redesigned again — baby pink heart-scallop border, bow &amp; star details, now uses a real designed graphic as the card face for a truer look</li>
+        </ul>
+        <b>✨ v1.9.7</b>
         <ul>
           <li>🎀 Brand new STAY ID card look — hot pink card with a lace scallop trim top &amp; bottom, star badge, serif details</li>
         </ul>
@@ -1326,7 +1282,7 @@
   helpOverlay.addEventListener('click', (e)=>{ if(e.target === helpOverlay) helpOverlay.classList.remove('show'); });
 
   // ---------------- app version ----------------
-  const APP_VERSION = 'v1.9.7';
+  const APP_VERSION = 'v1.9.8';
   document.getElementById('versionTag').textContent = APP_VERSION;
   document.getElementById('connectVersionTag').textContent = APP_VERSION;
 
@@ -1907,7 +1863,7 @@
     cardDate.textContent = `${dd}/${mm}/${today.getFullYear()}`;
 
     nameInput.addEventListener('input', ()=>{
-      cardName.textContent = nameInput.value.trim().toUpperCase() || 'YOUR NAME';
+      cardName.textContent = nameInput.value.trim().toUpperCase();
     });
 
     // ---------- photo upload + crop ----------
@@ -1978,9 +1934,9 @@
     document.getElementById('stayIdResetBtn').addEventListener('click', ()=>{
       nameInput.value = '';
       photoInput.value = '';
-      cardName.textContent = 'YOUR NAME';
+      cardName.textContent = '';
       cardDate.textContent = `${dd}/${mm}/${today.getFullYear()}`;
-      photoBox.innerHTML = '<span class="stayid-photo-placeholder">📷<br>YOUR PHOTO<br>HERE</span>';
+      photoBox.innerHTML = '';
       cardCode.textContent = generateID();
       showToast('Reset ✨');
     });
@@ -1994,15 +1950,9 @@
     // pixel width, and bake that in as a plain inline px value (no cqw left
     // for the export step to misinterpret). Restored right after.
     const STAYID_CQW_MAP = [
-      ['.stayid-photo-placeholder', 'fontSize', 2.3],
-      ['.stayid-ribbon', 'fontSize', 2.3],
-      ['.stayid-heading', 'fontSize', 6],
-      ['.stayid-subheading', 'fontSize', 2],
-      ['.stayid-field-label', 'fontSize', 2.1],
-      ['.stayid-field-box', 'fontSize', 2.7],
-      ['.stayid-static', 'fontSize', 2.7],
-      ['.stayid-idcode', 'fontSize', 2.1],
-      ['.stayid-wordmark', 'fontSize', 2.8],
+      ['.stayid-name-overlay', 'fontSize', 3.6],
+      ['.stayid-date-overlay', 'fontSize', 3],
+      ['.stayid-code-overlay', 'fontSize', 2.7],
     ];
     function lockCqwSizing(cardEl){
       const widthPx = cardEl.getBoundingClientRect().width;
